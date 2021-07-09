@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block navigate_intelligent_check %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">智能审核</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table>
+                                <tr>
+                                    <td>kmeans聚类算法</td>
+                                    <td><a href="{{ url_for('main.intelligent_kmeans') }}">
+                                        <i class="am-icon-pencil"></i>进入
+                                    </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+{% endblock %}

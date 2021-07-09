@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block navigate_intelligent_check %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">Kmeans聚类算法</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table width="100%"
+                                   class="am-table am-table-compact  tpl-table-black"
+                                   id="example-r">
+                                <tbody>
+                                <tr>
+                                    <td><input type="radio" name="default_or_customize" value="0" checked>自动设定算法参数
+                                    </td>
+                                    <td>
+                                        聚类个数:<input type="text" id="system_k" name="auto_checked" value="7">
+                                        标准值:<input type="text" id="system_i" name="auto_checked" value="8">
+                                        迭代次数:<input type="text" id="system_j" name="auto_checked" value="10">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="radio" name="default_or_customize" value="2">自定义</td>
+                                    <td>
+                                        聚类个数:<input type="text" id="customize_k" name="auto_checked">
+                                        标准值:<input type="text" id="customize_i" name="auto_checked">
+                                        迭代次数:<input type="text" id="customize_j" name="auto_checked">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>数据起止ID(最大{{ id_max }}: 最小:1)</td>
+                                    <td>起始ID:<input type="text" id="id_start" value="1" name="auto_checked">
+                                        终止ID:<input type="text" id="id_end" value="{{ id_max }}" name="auto_checked">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>选择要进行检测的属性</td>
+                                    <td>
+                                        <select id="para_type">
+                                            {% for x in p_types %}
+                                                <option value="{{ x.id }}">{{ x.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><a href="#">
+                                        <a class="screen-btn" id="start" href="javascript:;">开始</a> </a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="widget am-cf" id="not_show" style="display:none">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">分析结果</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table width="100%"
+                                   class="am-table am-table-compact  tpl-table-black">
+                                <tbody id="result">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript">
+        $("#start").click(function () {
+            var k, i, j, para_type;
+            var a = document.getElementsByName("default_or_customize");
+            if (a[0].checked) {
+                k = document.getElementById("system_k").value;
+                i = document.getElementById("system_i").value;
+                j = document.getElementById("system_j").value;
+
+            }
+            else if (a[1].checked) {
+                k = document.getElementById("customize_k").value;
+                i = document.getElementById("customize_i").value;
+                j = document.getElementById("customize_j").value;
+            }
+            var id_start = document.getElementById("id_start").value;
+            var id_end = document.getElementById("id_end").value;
+            var select_options = document.getElementById("para_type").options;
+            for (let n = 0; n < select_options.length; n++) {
+                if (select_options[n].selected) {
+                    para_type = select_options[n].value;
+                }
+            }
+
+            var _data = {'k': k, 'i': i, 'j': j, 'id_start': id_start, 'id_end': id_end, 'para_type': para_type};
+            $.ajax({
+                url: '{{ url_for('main.kmeans') }}',
+                type: 'POST',
+                data: JSON.stringify(_data),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    var not_show = document.getElementById("not_show");
+                    not_show.style.display = "block";
+                    var _tbody = document.getElementById('result');
+                    data = data['data'];
+                    _tbody.textContent = '';
+                    for (var i = 0; i < data['k']; i++) {
+                        var _tr = document.createElement('tr');
+                        _tr.className = 'gradeX';
+                        var _td1 = document.createElement('td');
+                        _td1.textContent = "聚簇" + i + "包含数据个数:";
+                        var _td2 = document.createElement('td');
+                        _td2.textContent = data['length_' + i];
+                        var _td3 = document.createElement('td');
+                        _td3.textContent = "包含参数ID";
+                        var _td4 = document.createElement('td');
+                        var text_area = document.createElement("textarea");
+                        text_area.rows = 6;
+                        text_area.cols = 30;
+                        var ids = "";
+                        for (var x = 0; x < data[i].length; x++) {
+                            ids = ids + data[i][x] + ",";
+                        }
+                        text_area.id = "id_area_" + i;
+                        text_area.innerText = ids;
+                        _td4.appendChild(text_area);
+                        _tr.appendChild(_td1);
+                        _tr.appendChild(_td2);
+                        _tr.appendChild(_td3);
+                        _tr.appendChild(_td4);
+                        _tbody.appendChild(_tr);
+                    }
+                    var _tr = document.createElement('tr');
+                    _tr.className = 'gradeX';
+                    var _td1 = document.createElement('td');
+                    var in_html = "";
+                    for (var i = 0; i < data['k']; i++) {
+                        in_html = in_html + "<input type=\"checkbox\" name=\"cluster_check\" value=\"" + i + "\">聚簇" + i
+                    }
+                    _td1.innerHTML = in_html;
+                    var _td2 = document.createElement('td');
+                    _td2.innerHTML = "<a class=\"screen-btn\" id=\"abnormal\" href=\"javascript:;\">设为异常</a> </a>";
+                    _tr.appendChild(_td1);
+                    _tr.appendChild(_td2);
+                    _tbody.appendChild(_tr);
+                    $(document).on('click', '#abnormal', function () {
+                            var ids = "";
+                            var cluster = document.getElementsByName("cluster_check");
+                            for (let i = 0; i < cluster.length; i++) {
+                                if (cluster[i].checked) {
+                                    var id_area = document.getElementById("id_area_" + cluster[i].value).value;
+                                    ids = ids + id_area
+                                }
+                            }
+                            console.info(ids);
+                            var _data = {"ids": ids};
+                            $.ajax({
+                                url: '{{ url_for('main.kmeans_apply') }}',
+                                type: 'POST',
+                                data: JSON.stringify(_data),
+                                dataType: 'json',
+                                contentType: 'application/json; charset=utf-8',
+                                success: function (data) {
+                                    window.alert("已经将数据标识为异常");
+                                },
+                                error: function (xhr) {
+                                    console.error('error');
+                                }
+                            });
+
+                        }
+                    )
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+        });
+    </script>
+{% endblock %}

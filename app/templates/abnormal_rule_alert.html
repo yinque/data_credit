@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block navigate_expert_rule_setup %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div style="text-align:center" class="widget-title am-fl">异常审核标准修改</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table width="100%"
+                                   class="am-table am-table-compact am-table-striped tpl-table-black"
+                                   id="example-r">
+                                <thead class="t-thead">
+                                <tr>
+                                    <th>异常参数类型名称</th>
+                                    <th>异常类型说明</th>
+                                    <th>审核标准</th>
+                                    <th>修改</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-content">
+                                <tr class="gradeX">
+                                    <td>{{ not_zero.name }}</td>
+                                    <td>{{ not_zero.description }}</td>
+                                    <td>连续<input id="con_not_zero" type="text" value="{{ not_zero.value }}">次</td>
+                                    <td><a class="screen-btn" id="alert_con_not_zero" href="javascript:;">修改</a></td>
+                                </tr>
+                                <tr class="gradeX">
+                                    <td>{{ zero.name }}</td>
+                                    <td>{{ zero.description }}</td>
+                                    <td>连续<input id="con_zero" type="text" value="{{ zero.value }}">次</td>
+                                    <td><a class="screen-btn" id="alert_con_zero" href="javascript:;">修改</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript">
+        $("#alert_con_not_zero").click(function () {
+            var _data = Object();
+            _data['value'] = document.getElementById("con_not_zero").value;
+            _data['name'] = "{{ not_zero.name }}";
+            $.ajax({
+                url: '{{ url_for('main.abnormal_rule_alert') }}',
+                type: 'POST',
+                data: JSON.stringify(_data),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+        });
+        $("#alert_con_zero").click(function () {
+            var _data = Object();
+            _data['value'] = document.getElementById("con_zero").value;
+            _data['name'] = "{{ zero.name }}";
+            $.ajax({
+                url: '{{ url_for('main.abnormal_rule_alert') }}',
+                type: 'POST',
+                data: JSON.stringify(_data),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+        });
+
+    </script>
+{% endblock %}

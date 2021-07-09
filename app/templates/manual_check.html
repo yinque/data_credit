@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block head %}
+    {{ super() }}
+    <script src="{{ url_for("static",filename="assets/js/manage.js") }}"></script>
+    <script src="{{ url_for("static",filename="assets/js/pagination.js") }}"></script>
+
+{% endblock %}
+{% block navigate_manual_check %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">数据人工审核</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <div class="screen-div">
+                                <span>起始时间：</span>
+                                <input type="text" placeholder="--请输入--" id="trains_start">
+                                <span>终止时间：</span>
+                                <input type="text" placeholder="--请输入--" id="trains_end">
+                                <span>异常类别：</span>
+                                <select id="abnormal_type">
+                                    <option selected value="all">所有异常</option>
+                                    {% for type in abnormal_types %}
+                                        <option value="{{ type.name }}">{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                </br>
+                                <span>选择审核参数：</span>
+                                {% for x in p_types %}
+                                    <input type="checkbox" name="parameters" value="{{ x.id }}" checked>{{ x.name }}
+                                {% endfor %}
+                                </br>
+                                <span>选择审核类型：</span>
+                                <input type="radio" name="check_type" value="all" checked>全部数据
+                                <input type="radio" name="check_type" value="true">自动审核有异常数据
+                                <input type="radio" name="check_type" value="false">自动审核无异常数据
+
+                                <a class="screen-btn" id="data_btn" href="javascript:">查询</a>
+                            </div>
+                            <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black "
+                                   id="example_r">
+                                <thead class="t-thead">
+                                <tr>
+                                    <th>时间</th>
+                                    {% for x in p_types %}
+                                        <th>{{ x.name }}({{ x.unit }})</th>
+                                    {% endfor %}
+                                    <th>修改</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-content">
+                                {#                                <div id="trains_iterms"></div>#}
+                                </tbody>
+                            </table>
+
+                            <div class="am-fr">
+                                <div class="am-pagination tpl-pagination">
+                                    <div id="data_widget"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript">
+        var para_type = ['时间' {% for x in p_types %}, '{{ x.name }}'{% endfor %}];
+        pag = new Pagination('/manual_check_result', para_type, 'example_r', 'data_widget', 'pag', true, "#FF0000");
+        pag.createTr = function (item) {
+            var _tr = document.createElement('tr');
+            _tr.className = 'gradeX';
+            for (var i = 0; i < this.column_names.length; i++) {
+                if (this.btn.indexOf(this.column_names[i]) === -1) {
+                    if (item['abnormals'].indexOf(this.column_names[i]) > -1) {
+                        this.addTd(_tr, item[this.column_names[i]], false, this.color);
+                    }
+                    else {
+                        this.addTd(_tr, item[this.column_names[i]], false, false);
+                    }
+
+                }
+                else {
+                    if (item[abnormals].indexOf(this.column_names[i])) {
+                        this.addTd(_tr, item[this.column_names[i]], true, this.color);
+                    }
+                    else {
+                        this.addTd(_tr, item[this.column_names[i]], true, false);
+                    }
+                }
+
+            }
+            _td = document.createElement('td');
+            _a = document.createElement('a');
+            _a.href = item['manual_check_detail'];
+            _a.innerText = '修改';
+            _td.appendChild(_a);
+            _tr.appendChild(_td);
+            return _tr;
+        };
+        pag.turnPage(1);
+        $("#data_btn").click(function () {
+            var _data = Object();
+            var a_type_select = document.getElementById("abnormal_type");
+            var a_type;
+            var check_type;
+            var paras = [];
+            for (let i = 0; i < a_type_select.options.length; i++) {
+                if (a_type_select.options[i].selected) {
+                    a_type = a_type_select.options[i].value
+                }
+            }
+            _data['abnormal_type'] = a_type;
+            var data_start = $("#trains_start").val();
+            var data_end = $("#trains_end").val();
+
+            if (data_start == '' || data_end == '') {
+                _data['start_time'] = "0001-01-01";
+                _data['end_time'] = "2999-12-31";
+            } else {
+                _data['start_time'] = data_start;
+                _data['end_time'] = data_end;
+            }
+            var c_type = document.getElementsByName("check_type");
+            for (let i = 0; i < c_type.length; i++) {
+                if (c_type[i].checked) {
+                    check_type = c_type[i].value;
+                }
+            }
+            _data['check_type'] = check_type;
+            var p_list = document.getElementsByName("parameters");
+            for (let i = 0; i < p_list.length; i++) {
+                if (p_list[i].checked) {
+                    paras.push(p_list[i].value)
+                }
+            }
+            _data['paras'] = paras;
+            pag.setData(_data);
+            pag.turnPage(1)
+        });
+
+        //读取cookie
+        function getCookie(objName) {//获取指定名称的cookie的值
+            var arrStr = document.cookie.split("; ");
+            for (var i = 0; i < arrStr.length; i++) {
+                var temp = arrStr[i].split("=");
+                if (temp[0] == objName) return unescape(temp[1]);
+            }
+            return "";
+        }
+    </script>
+{% endblock %}

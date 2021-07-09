@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block head %}
+    {{ super() }}
+    <script src="{{ url_for("static",filename="assets/js/manage.js") }}"></script>
+    <script src="{{ url_for("static",filename="assets/js/pagination.js") }}"></script>
+{% endblock %}
+{% block navigate_auto_check %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">数据自动审核</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            {#                            <table width="100%"#}
+                            {#                                   class="am-table am-table-compact  tpl-table-black"#}
+                            {#                                   id="example-r">#}
+                            {#                                <thead class="t-thead">#}
+                            {#                                <tr>#}
+                            {#                                    <th>时间</th>#}
+                            {#                                    {% for x in p_types %}#}
+                            {#                                        <th>{{ x.name }}({{ x.unit }})</th>#}
+                            {#                                    {% endfor %}#}
+                            {#                                    <th>异常详情</th>#}
+                            {#                                </tr>#}
+                            {#                                </thead>#}
+                            {#                                <tbody>#}
+                            {#                                {% for x in datas %}#}
+                            {#                                    <tr>#}
+                            {#                                        <td>{{ x.time }}</td>#}
+                            {#                                        {% for y in x.sort_para %}#}
+                            {#                                            <td{% if not y.value %}#}
+                            {#                                                bgcolor="#FF0000"#}
+                            {#                                            {% endif %}{% if y.is_abnormal %}#}
+                            {#                                                bgcolor="#FF0000"#}
+                            {#                                            {% endif %}>{{ y.value }}</td>#}
+                            {#                                        {% endfor %}#}
+                            {#                                        <td>#}
+                            {#                                            <a href="{{ url_for("main.abnormal_detail",page=pagination.page,a_id=x.id) }}">#}
+                            {#                                                <i class="am-icon-pencil"></i>查看#}
+                            {#                                            </a></td>#}
+                            {#                                    </tr>#}
+                            {#                                {% endfor %}#}
+                            {#                                </tbody>#}
+                            {#                            </table>#}
+                            {#                            <div class="am-fr">#}
+                            {#                                <div class="am-pagination tpl-pagination">#}
+                            {#                                    {{ macros.pagination_widget(pagination,'main.auto_check') }}#}
+                            {#                                </div>#}
+                            {#                            </div>#}
+                            <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black "
+                                   id="example_r">
+                                <thead class="t-thead">
+                                <tr>
+                                    <th>时间</th>
+                                    {% for x in p_types %}
+                                        <th>{{ x.name }}({{ x.unit }})</th>
+                                    {% endfor %}
+                                    <th>异常详情</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-content">
+                                {#                                <div id="trains_iterms"></div>#}
+                                </tbody>
+                            </table>
+
+                            <div class="am-fr">
+                                <div class="am-pagination tpl-pagination">
+                                    <div id="data_widget"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript">
+        var para_type = ['时间' {% for x in p_types %}, '{{ x.name }}'{% endfor %}];
+        pag = new Pagination('/auto_check_result', para_type, 'example_r', 'data_widget', 'pag', true, "#FF0000");
+        pag.createTr = function (item) {
+            var _tr = document.createElement('tr');
+            _tr.className = 'gradeX';
+            for (var i = 0; i < this.column_names.length; i++) {
+                if (this.btn.indexOf(this.column_names[i]) === -1) {
+                    if (item['abnormals'].indexOf(this.column_names[i]) > -1) {
+                        this.addTd(_tr, item[this.column_names[i]], false, this.color);
+                    }
+                    else {
+                        this.addTd(_tr, item[this.column_names[i]], false, false);
+                    }
+
+                }
+                else {
+                    if (item[abnormals].indexOf(this.column_names[i])) {
+                        this.addTd(_tr, item[this.column_names[i]], true, this.color);
+                    }
+                    else {
+                        this.addTd(_tr, item[this.column_names[i]], true, false);
+                    }
+                }
+
+            }
+            _td = document.createElement('td');
+            _a = document.createElement('a');
+            _a.href = item['auto_check_detail'];
+            _a.innerText = '查看';
+            _td.appendChild(_a);
+            _tr.appendChild(_td);
+            return _tr;
+        };
+        pag.turnPage(1);
+
+        //读取cookie
+        function getCookie(objName) {//获取指定名称的cookie的值
+            var arrStr = document.cookie.split("; ");
+            for (var i = 0; i < arrStr.length; i++) {
+                var temp = arrStr[i].split("=");
+                if (temp[0] == objName) return unescape(temp[1]);
+            }
+            return "";
+        }
+    </script>
+{% endblock %}
