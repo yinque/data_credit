@@ -139,6 +139,7 @@ def upload():
             Data.empty_analysis_range(x, data_id_list)
             Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
                                            data_id_list)
+
         return redirect(url_for('main.upload_success', count=count))
     return render_template('upload.html')
 
