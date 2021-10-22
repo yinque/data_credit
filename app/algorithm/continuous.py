@@ -37,6 +37,25 @@ def continuous_analysis(para_list: list, n: int):
             head = tail
     return list(set(abnormal_list))  # 进行了一次去重，后续可以通过优化算法去掉去重的步骤，提高效率
 
+def continuous_zeros_analysis(para_list: list, n: int):
+    """
+    检测一列参数中哪些数据出现了连续n次连续不变的异常
+    :param para_list:Parameter类型的数据列
+    :param n: 要检测的数据连续个数
+    :return:Parameter类型的数据列，内容为出现了异常的Parameter类型变量
+    """
+    abnormal_list = []
+    head = 0
+    for tail in range(len(para_list)):
+        if para_list[tail].value == para_list[head].value and para_list[head].value==0:
+            if tail - head == n - 1:
+                for y in range(head, tail + 1):
+                    abnormal_list.append(para_list[y])
+                head += 1
+        else:
+            head = tail
+    return list(set(abnormal_list))  # 进行了一次去重，后续可以通过优化算法去掉去重的步骤，提高效率
+
 
 if __name__ == '__main__':
     p_l1 = []
