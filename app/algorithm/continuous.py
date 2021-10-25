@@ -47,7 +47,7 @@ def continuous_zeros_analysis(para_list: list, n: int):
     abnormal_list = []
     head = 0
     for tail in range(len(para_list)):
-        if para_list[tail]].value==0 and  para_list[tail].value == para_list[head].value:
+        if para_list[tail].value==0 and  para_list[tail].value == para_list[head].value:
             if tail - head == n - 1:
                 for y in range(head, tail + 1):
                     abnormal_list.append(para_list[y])
