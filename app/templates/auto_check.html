@@ -85,7 +85,7 @@
     {{ super() }}
     <script type="text/javascript">
         var para_type = ['时间' {% for x in p_types %}, '{{ x.name }}'{% endfor %}];
-        pag = new Pagination('/auto_check_result', para_type, 'example_r', 'data_widget', 'pag', true, "#FF6600");
+        pag = new Pagination('/auto_check_result', para_type, 'example_r', 'data_widget', 'pag', true, "#FFA07A");
         pag.createTr = function (item) {
             var _tr = document.createElement('tr');
             _tr.className = 'gradeX';
