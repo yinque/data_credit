@@ -8,6 +8,7 @@ __mtime__ = '2018/5/15'
 from app import db
 from .algorithm.continuous import continuous_analysis
 from flask import url_for
+from time import time
 
 FORMAT_DATA = '%Y-%m-%d'
 FORMAT_DATA_TIME = '%Y-%m-%d %H:%M:%S'
@@ -27,8 +28,8 @@ class Data(db.Model):
     def __init__(self, time=None, is_abnormal=None):
         self.time = time
         self.is_abnormal = is_abnormal
-        db.session.add(self)
-        db.session.commit()
+        # db.session.add(self)
+        # db.session.commit()
 
     @property
     def show_dict(self):
@@ -76,18 +77,24 @@ class Data(db.Model):
 
     @staticmethod
     def empty_analysis_range(para_type_id: int, datas_id: list):
+        s_time = time()
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
+        empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
+        p_list =[]
         for x in p:
             if x.empty():
                 x.data.is_abnormal = True
                 x.is_abnormal = True
                 _n = Abnormal()
                 _n.parameter_id = x.id
-                _n.abnormal_type_id = AbnormalTypes.query.filter_by(name="empty").first().id
+                _n.abnormal_type_id = empty_abnormal_id
                 _n.parameter_type_id = para_type_id
                 x.data.abnormals.append(_n)
-                db.session.add(x)
+                # db.session.add(x)
+                p_list.append(x)
+        db.session.add_all(p_list)
         db.session.commit()
+        print("空值检测共用时%d"%(time()-s_time))
 
     @staticmethod
     def continuous_analysis(para_type_id: int, n: int):
@@ -99,15 +106,18 @@ class Data(db.Model):
         """
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).all()
         abnotmal_list = continuous_analysis(p, n)
+        abnormal_id= AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+        p_list = []
         for x in abnotmal_list:
             x.data.is_abnormal = True
             x.is_abnormal = True
             _n = Abnormal()
             _n.parameter_id = x.id
-            _n.abnormal_type_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+            _n.abnormal_type_id = abnormal_id
             _n.parameter_type_id = para_type_id
             x.data.abnormals.append(_n)
-            db.session.add(x)
+            p_list.append(x)
+        db.session.add_all(p_list)
         db.session.commit()
 
     @staticmethod
@@ -118,18 +128,24 @@ class Data(db.Model):
         :param n:
         :return:
         """
+        s_time = time()
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
         abnotmal_list = continuous_analysis(p, n)
+        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+        p_list=[]
         for x in abnotmal_list:
             x.data.is_abnormal = True
             x.is_abnormal = True
             _n = Abnormal()
             _n.parameter_id = x.id
-            _n.abnormal_type_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+            _n.abnormal_type_id = abnormal_id
             _n.parameter_type_id = para_type_id
             x.data.abnormals.append(_n)
-            db.session.add(x)
+            # db.session.add(x)
+            p_list.append(x)
+        db.session.add_all(p_list)
         db.session.commit()
+        print("连续值检测共用时%d" % (time() - s_time))
 
 
 class Abnormal(db.Model):
@@ -176,8 +192,6 @@ class Parameter(db.Model):
         self.value = value
         self.data_id = data_id
         self.parameter_type_id = parameter_type_id
-        db.session.add(self)
-        db.session.commit()
 
     def empty(self):
         if self.value is None:

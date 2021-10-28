@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime, timedelta
 from app.pagination import Pagination
 from app.algorithm.kmeans import kmeans_analysis
+import time
 
 re_float = r'-?\d+\.?\d*e?-?\d*?'
 FORMAT_DATE = '%Y-%m-%d'
@@ -61,7 +62,7 @@ def read_excel(src):
     data_count = 0
     count = 0
     frame = pd.read_excel(src)
-    print(frame)
+    # print(frame)
     columns = frame.columns
     for x in columns:
         try:
@@ -74,36 +75,33 @@ def read_excel(src):
             if not pt:
                 pt = ParameterTypes(name=a, unit=b)
                 db.session.add(pt)
-                db.session.commit()
+    db.session.commit()
     column_dict = {x.name: x.id for x in ParameterTypes.query.all()}
-    paras_id_list = []
-    data_id_list = []
     try:
+        d_list = []
         for x in frame.values:
             c_v = zip(columns, x)
             data = Data(time=datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'), is_abnormal=False)
-            db.session.add(data)
-            db.session.commit()
+            d_list.append(data)
             data_count += 1
-            data_id_list.append(data.id)
             for y in c_v:
                 value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
-                pa = Parameter(value=value, data_id=data.id, parameter_type_id=column_dict[y[0].split('(')[0]])
-                db.session.add(pa)
-                db.session.commit()
-                paras_id_list.append(pa.id)
+                data.parameters.append(
+                    Parameter(value=value, data_id=None, parameter_type_id=column_dict[y[0].split('(')[0]]))
             count += 1
+        db.session.add_all(d_list)
+        db.session.commit()
     except:
-        for x in paras_id_list:
-            p = Parameter.query.filter_by(id=x).first()
-            db.session.delete(p)
-            db.session.commit()
-        for x in data_id_list:
-            d = Data.query.filter_by(id=x).first()
-            db.session.delete(d)
-            db.session.commit()
-        count = 0
-    return count, data_id_list
+        # for x in paras_id_list:
+        #     p = Parameter.query.filter_by(id=x).first()
+        #     db.session.delete(p)
+        # for x in data_id_list:
+        #     d = Data.query.filter_by(id=x).first()
+        #     db.session.delete(d)
+        # count = 0
+        # db.session.commit()
+        pass
+    return count, [x.id for x in d_list]
 
 
 @main.route('/')
@@ -133,13 +131,16 @@ def upload():
         new_filename = uuid.uuid4().hex + '.' + file.filename.split('.')[-1]
         file_path = os.path.join(current_app.config['UPLOAD_PATH'], new_filename)
         file.save(file_path)
+        d_time = time.time()
         count, data_id_list = read_excel(file_path)
+        print("创建数据共用时%d秒" % (time.time() - d_time))
         para_type_id_list = [x.id for x in ParameterTypes.query.all()]
+        s_time = time.time()
         for x in para_type_id_list:
             Data.empty_analysis_range(x, data_id_list)
             Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
                                            data_id_list)
-
+        print("进行初始分析共用时%d秒" % (time.time() - s_time))
         return redirect(url_for('main.upload_success', count=count))
     return render_template('upload.html')
 
