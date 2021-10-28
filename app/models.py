@@ -80,7 +80,7 @@ class Data(db.Model):
         s_time = time()
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
         empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
-        p_list =[]
+        p_list = []
         for x in p:
             if x.empty():
                 x.data.is_abnormal = True
@@ -94,7 +94,7 @@ class Data(db.Model):
                 p_list.append(x)
         db.session.add_all(p_list)
         db.session.commit()
-        print("空值检测共用时%d"%(time()-s_time))
+        print("空值检测共用时%d" % (time() - s_time))
 
     @staticmethod
     def continuous_analysis(para_type_id: int, n: int):
@@ -106,7 +106,7 @@ class Data(db.Model):
         """
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).all()
         abnotmal_list = continuous_analysis(p, n)
-        abnormal_id= AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
         p_list = []
         for x in abnotmal_list:
             x.data.is_abnormal = True
@@ -132,7 +132,7 @@ class Data(db.Model):
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
         abnotmal_list = continuous_analysis(p, n)
         abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
-        p_list=[]
+        p_list = []
         for x in abnotmal_list:
             x.data.is_abnormal = True
             x.is_abnormal = True

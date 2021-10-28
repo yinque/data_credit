@@ -64,6 +64,7 @@ def read_excel(src):
     frame = pd.read_excel(src)
     # print(frame)
     columns = frame.columns
+    empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
     for x in columns:
         try:
             a, b = x.split('(')
@@ -86,8 +87,16 @@ def read_excel(src):
             data_count += 1
             for y in c_v:
                 value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
-                data.parameters.append(
-                    Parameter(value=value, data_id=None, parameter_type_id=column_dict[y[0].split('(')[0]]))
+                p = Parameter(value=value, data_id=None, parameter_type_id=column_dict[y[0].split('(')[0]])
+                if value is None:
+                    p.is_abnormal = True
+                    data.is_abnormal = True
+                    _n = Abnormal()
+                    _n.abnormal_type_id = empty_abnormal_id
+                    _n.parameter_type_id = column_dict[y[0].split('(')[0]]
+                    p.abnormals.append(_n)
+                    data.abnormals.append(_n)
+                data.parameters.append(p)
             count += 1
         db.session.add_all(d_list)
         db.session.commit()
@@ -127,20 +136,18 @@ def auto_check():
 @main.route('/upload', methods=['POST', 'GET'])
 def upload():
     if request.method == 'POST':
+        s_time = time.time()
         file = request.files['file']
         new_filename = uuid.uuid4().hex + '.' + file.filename.split('.')[-1]
         file_path = os.path.join(current_app.config['UPLOAD_PATH'], new_filename)
         file.save(file_path)
-        d_time = time.time()
         count, data_id_list = read_excel(file_path)
-        print("创建数据共用时%d秒" % (time.time() - d_time))
         para_type_id_list = [x.id for x in ParameterTypes.query.all()]
-        s_time = time.time()
         for x in para_type_id_list:
-            Data.empty_analysis_range(x, data_id_list)
+            # Data.empty_analysis_range(x, data_id_list)
             Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
                                            data_id_list)
-        print("进行初始分析共用时%d秒" % (time.time() - s_time))
+        print("上传数据共用时%d秒" % (time.time() - s_time))
         return redirect(url_for('main.upload_success', count=count))
     return render_template('upload.html')
 
