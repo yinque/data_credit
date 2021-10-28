@@ -1,4 +1,4 @@
-function Pagination(url, column_names, tb_id, widget_id, name,color,td_color) {
+function Pagination(url, column_names, tb_id, widget_id, name,color,td_color,front_color) {
     this.url = url;
     this.tb_id = tb_id;
     this.column_names = column_names;
@@ -8,6 +8,7 @@ function Pagination(url, column_names, tb_id, widget_id, name,color,td_color) {
     this.btn = [];
     this.color = color;
     this.td_color = td_color;
+    this.front_colot = front_color;
 
     this.setBtn = function (btn_list) {
         this.btn = btn_list;
@@ -87,6 +88,7 @@ function Pagination(url, column_names, tb_id, widget_id, name,color,td_color) {
         }
         if (color){
             _td.style.backgroundColor=this.td_color;
+            _td.style.color=this.front_colot;
         }
         _tr.appendChild(_td);
     };
