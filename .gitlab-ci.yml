@@ -22,5 +22,5 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Deploying application..."
     - echo "Pulling git"
     - echo "Docker building"
-    - docker-compose -f docker-compose.dev.yml up --build -d
+    - sudo docker-compose -f docker-compose.dev.yml up --build -d
     - echo "Application successfully deployed."
