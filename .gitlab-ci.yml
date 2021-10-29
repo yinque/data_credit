@@ -23,6 +23,7 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Changing path"
     - cd /data_credit
     - echo "Pulling git"
+    - pwd
     - git pull
     - echo "Docker building"
     - docker-compose -f docker-compose.dev.yml up --build -d
