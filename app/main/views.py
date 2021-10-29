@@ -120,7 +120,7 @@ def index():
 
 @main.route('/test_auto_deploy')
 def test_auto_deploy():
-    return "test 1 success"
+    return "test 2 success"
 
 
 @main.route('/auto_check')
