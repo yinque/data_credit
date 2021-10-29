@@ -21,6 +21,7 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Pulling git"
+    - pwd
     - git pull
     - ls -a
     - echo "Docker building"
