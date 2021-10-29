@@ -20,12 +20,9 @@ deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   script:
     - echo "Deploying application..."
-    - echo "Changing path"
-    - cd /home/jsj4/data_credit
     - echo "Pulling git"
-    - pwd
-    - who
     - git pull
+    - ls -a
     - echo "Docker building"
     - docker-compose -f docker-compose.dev.yml up --build -d
     - echo "Application successfully deployed."
