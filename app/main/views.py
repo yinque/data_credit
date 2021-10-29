@@ -118,6 +118,11 @@ def index():
     return render_template('index.html')
 
 
+@main.route('/test_auto_deploy')
+def test_auto_deploy():
+    return "test 1 success"
+
+
 @main.route('/auto_check')
 def auto_check():
     p_types = ParameterTypes.query.all()

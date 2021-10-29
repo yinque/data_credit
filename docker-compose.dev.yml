@@ -5,7 +5,7 @@ services:
   build:
    context: .
   ports:
-  - 80:6666
+  - 8080:6666
   environment:
   - FLASK_CONFIG=production
   volumes:
