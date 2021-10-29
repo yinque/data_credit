@@ -24,6 +24,7 @@ deploy-job:      # This job runs in the deploy stage.
     - cd /data_credit
     - echo "Pulling git"
     - pwd
+    - users
     - git pull
     - echo "Docker building"
     - docker-compose -f docker-compose.dev.yml up --build -d
