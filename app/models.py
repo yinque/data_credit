@@ -28,8 +28,6 @@ class Data(db.Model):
     def __init__(self, time=None, is_abnormal=None):
         self.time = time
         self.is_abnormal = is_abnormal
-        # db.session.add(self)
-        # db.session.commit()
 
     @property
     def show_dict(self):
@@ -90,7 +88,6 @@ class Data(db.Model):
                 _n.abnormal_type_id = empty_abnormal_id
                 _n.parameter_type_id = para_type_id
                 x.data.abnormals.append(_n)
-                # db.session.add(x)
                 p_list.append(x)
         db.session.add_all(p_list)
         db.session.commit()
@@ -150,15 +147,6 @@ class Data(db.Model):
                 "abnormal_type_id": abnormal_id,
                 "parameter_type_id": para_type_id})
             start_a_id += 1
-            # x.data.is_abnormal = True
-            # x.is_abnormal = True
-            # _n = Abnormal()
-            # _n.parameter_id = x.id
-            # _n.abnormal_type_id = abnormal_id
-            # _n.parameter_type_id = para_type_id
-            # x.data.abnormals.append(_n)
-            # p_list.append(x)
-
         c_time = time()
         print("参数表长度%d" % len(p_list))
         print("数据表长度%d" % len(d_list))
@@ -170,21 +158,6 @@ class Data(db.Model):
         end_time = time()
         print("提取异常用时%d,连续值检测插入用时%d，异常元素创建用时%d秒，连续检测共用时%d" % (
             (t_time - s_time), (end_time - c_time), (c_time - create_time), (end_time - s_time)))
-
-
-def update_parameter_is_abnormal(id_list, is_abnormal):
-    for x in id_list:
-        db.session.execute("update parameter set is_abnormal=%d where id=%d" % (is_abnormal, x))
-
-
-def get_parameters(para_type_id: int, datas_id: list):
-    datas = Data.query.filter(Data.id.in_(datas_id)).all()
-    parameters = []
-    for x in datas:
-        for y in x.parameters:
-            if y.parameter_type_id == para_type_id:
-                parameters.append(y)
-    return parameters
 
 
 class Abnormal(db.Model):
