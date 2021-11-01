@@ -56,15 +56,19 @@ def create_abnormal_type():
             t.name = x
             db.session.add(t)
     db.session.commit()
+    current_app.config['abnormal_types'] = {x.name: x.id for x in AbnormalTypes.query.all()}
+
+
+def create_id_list(start_id, length):
+    return [x for x in range(start_id, start_id + length)]
 
 
 def read_excel(src):
-    data_count = 0
-    count = 0
     frame = pd.read_excel(src)
-    # print(frame)
     columns = frame.columns
     empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
+    pts = [x.name for x in ParameterTypes.query.all()]
+    pt_list = []
     for x in columns:
         try:
             a, b = x.split('(')
@@ -72,45 +76,54 @@ def read_excel(src):
             pass
         else:
             b = b.split(")")[0]
-            pt = ParameterTypes.query.filter_by(name=a).first()
-            if not pt:
-                pt = ParameterTypes(name=a, unit=b)
-                db.session.add(pt)
+            if a not in pts:
+                pt_list.append(ParameterTypes(name=a, unit=b))
+    db.session.add_all(pt_list)
     db.session.commit()
+    # 完成数据元素类型建表
     column_dict = {x.name: x.id for x in ParameterTypes.query.all()}
-    try:
-        d_list = []
-        for x in frame.values:
-            c_v = zip(columns, x)
-            data = Data(time=datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'), is_abnormal=False)
-            d_list.append(data)
-            data_count += 1
-            for y in c_v:
-                value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
-                p = Parameter(value=value, data_id=None, parameter_type_id=column_dict[y[0].split('(')[0]])
-                if value is None:
-                    p.is_abnormal = True
-                    data.is_abnormal = True
-                    _n = Abnormal()
-                    _n.abnormal_type_id = empty_abnormal_id
-                    _n.parameter_type_id = column_dict[y[0].split('(')[0]]
-                    p.abnormals.append(_n)
-                    data.abnormals.append(_n)
-                data.parameters.append(p)
-            count += 1
-        db.session.add_all(d_list)
-        db.session.commit()
-    except:
-        # for x in paras_id_list:
-        #     p = Parameter.query.filter_by(id=x).first()
-        #     db.session.delete(p)
-        # for x in data_id_list:
-        #     d = Data.query.filter_by(id=x).first()
-        #     db.session.delete(d)
-        # count = 0
-        # db.session.commit()
-        pass
-    return count, [x.id for x in d_list]
+    d_list, p_list, ab_list = [], [], []
+    _start_p_id = db.session.execute("select MAX(id) from parameter").first()[0]
+    start_p_id = _start_p_id + 1 if _start_p_id else 1
+    _start_d_id = db.session.execute("select MAX(id) from data").first()[0]
+    start_d_id = _start_d_id + 1 if _start_d_id else 1
+    _start_a_id = db.session.execute("select MAX(id) from abnormal").first()[0]
+    start_a_id = _start_a_id + 1 if _start_a_id else 1
+    for x in frame.values:
+        c_v = zip(columns, x)
+        d_abnormal = False
+        p_abnormal = False
+        d_list.append(
+            {
+                "id": start_d_id,
+                "time": datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'),
+                "is_abnormal": d_abnormal
+            })  # 插入一条数据
+        for y in c_v:
+            value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
+            if value is None:
+                d_list[-1]['is_abnormal'] = True
+                p_abnormal = True
+                ab_list.append({
+                    "id": start_a_id,
+                    "data_id": start_d_id,
+                    "parameter_id": start_p_id,
+                    "abnormal_type_id": empty_abnormal_id,
+                    "parameter_type_id": column_dict[y[0].split('(')[0]]})  # 插入一条异常数据到列表
+                start_a_id += 1
+            p_list.append({
+                "id": start_p_id,
+                "value": value,
+                "data_id": start_d_id,
+                "parameter_type_id": column_dict[y[0].split('(')[0]],
+                "is_abnormal": p_abnormal})  # 插入一条参数数据
+            start_p_id += 1
+        start_d_id += 1
+    db.session.execute(Data.__table__.insert(), d_list)
+    db.session.execute(Parameter.__table__.insert(), p_list)
+    db.session.execute(Abnormal.__table__.insert(), ab_list)
+    db.session.commit()
+    return len(d_list), [x["id"] for x in d_list]
 
 
 @main.route('/')
@@ -147,12 +160,13 @@ def upload():
         file_path = os.path.join(current_app.config['UPLOAD_PATH'], new_filename)
         file.save(file_path)
         count, data_id_list = read_excel(file_path)
+        u_time = time.time()
         para_type_id_list = [x.id for x in ParameterTypes.query.all()]
         for x in para_type_id_list:
-            # Data.empty_analysis_range(x, data_id_list)
             Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
                                            data_id_list)
-        print("上传数据共用时%d秒" % (time.time() - s_time))
+        end_time = time.time()
+        print("创建数据共用时%d,本次上传用时%d秒" % (u_time - s_time, end_time - s_time))
         return redirect(url_for('main.upload_success', count=count))
     return render_template('upload.html')
 
