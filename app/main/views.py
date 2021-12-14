@@ -343,6 +343,11 @@ def intelligent_check():
     return render_template('intelligent_check.html')
 
 
+@main.route('/intelligent_rule_setup')
+def intelligent_rule_setup():
+    return render_template('intelligent_rule_setup.html')
+
+
 @main.route('/intelligent_kmeans')
 def intelligent_kmeans():
     p_types = ParameterTypes.query.all()
