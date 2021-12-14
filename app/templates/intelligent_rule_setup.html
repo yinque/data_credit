@@ -9,25 +9,85 @@
 
                     <div class="widget am-cf">
                         <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">智能规则规则设置</div>
+                            <div class="widget-title am-fl">算法上传</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <form action="" enctype='multipart/form-data' method='POST'>
+                                <table>
+                                    <tr>
+                                        <td>算法名</td>
+                                        <td><input type="text"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>算法描述</td>
+                                        <td><textarea rows="6" cols="30">填写算法描述</textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>先训练再识别还是直接识别</td>
+                                        <td><input type="radio">训练后识别<input type="radio">直接识别</td>
+                                    </tr>
+                                    <tr>
+                                        <td>算法文件</td>
+                                        <td><input type="file" name="file">
+                                    </tr>
+                                    <tr>
+                                        <td>参数名:<input type="text"></td>
+                                        <td>参数值:<input type="text"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>参数名:<input type="text"></td>
+                                        <td>参数值:<input type="text"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>参数名:<input type="text"></td>
+                                        <td>参数值:<input type="text"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="button" value="增加参数"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="submit" value="提交"></td>
+                                    </tr>
+                                </table>
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">算法列表</div>
                         </div>
                         <div class="widget-body am-fr">
                             <table>
-{#                                <tr>#}
-{#                                    <td>异常审核标准修改</td>#}
-{#                                    <td><a href="{{ url_for('main.abnormal_rule_alert') }}">#}
-{#                                        <i class="am-icon-pencil"></i>进入#}
-{#                                    </a>#}
-{#                                    </td>#}
-{#                                </tr>#}
-{#                                <tr>#}
-{#                                    <td>参数范围设置</td>#}
-{#                                    <td>#}
-{#                                        <a href="{{ url_for('main.parameter_range_alert') }}">#}
-{#                                            <i class="am-icon-pencil"></i>进入#}
-{#                                        </a>#}
-{#                                    </td>#}
-{#                                </tr>#}
+                                <tr>
+                                    <td>算法上传名称</td>
+                                    <td>算法参数</td>
+                                    <td>参数修改</td>
+                                </tr>
+                                <tr>
+                                    <td>oneClassSVM</td>
+                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
+                                    <td><a href="#">
+                                        <i class="am-icon-pencil"></i>修改
+                                    </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>LOF</td>
+                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
+                                    <td><a href="#">
+                                        <i class="am-icon-pencil"></i>修改
+                                    </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>isolation forest</td>
+                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
+                                    <td><a href="#">
+                                        <i class="am-icon-pencil"></i>修改
+                                    </a>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>

@@ -159,6 +159,13 @@ class Data(db.Model):
         print("提取异常用时%d,连续值检测插入用时%d，异常元素创建用时%d秒，连续检测共用时%d" % (
             (t_time - s_time), (end_time - c_time), (c_time - create_time), (end_time - s_time)))
 
+    def get_para_tuple(self, para_type_id_list: list):
+        l = []
+        for x in para_type_id_list:
+            p = Parameter.query.filter(Parameter.data_id == self.id and Parameter.parameter_type_id == x).first()
+            l.append(p.value)
+        return tuple(l)
+
 
 class Abnormal(db.Model):
     """abnormal table"""

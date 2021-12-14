@@ -13,13 +13,110 @@
                         </div>
                         <div class="widget-body am-fr">
                             <table>
+                                <tbody>
                                 <tr>
-                                    <td>kmeans聚类算法</td>
-                                    <td><a href="{{ url_for('main.intelligent_kmeans') }}">
-                                        <i class="am-icon-pencil"></i>进入
-                                    </a>
+                                    <td>选择算法</td>
+                                    <td>
+                                        <select id="para_type">
+                                            <option value="1">oneClassSVM</option>
+                                            <option value="2">isolation forest</option>
+                                            <option value="3">LOF</option>
+                                        </select>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>参数1</td>
+                                    <td>123</td>
+                                </tr>
+                                <tr>
+                                    <td>参数2</td>
+                                    <td>5563</td>
+                                </tr>
+                                <tr>
+                                    <td>参数3</td>
+                                    <td>56643</td>
+                                </tr>
+                                <tr>
+                                    <td>数据起止ID(最大11456: 最小:1)</td>
+                                    <td>起始ID:<input type="text" id="id_start" value="1" name="auto_checked">
+                                        终止ID:<input type="text" id="id_end" value="11456" name="auto_checked">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>选择要检测的数据元素</td>
+                                    <td><input type="checkbox" name="parameters" value="1" checked>水温
+
+                                        <input type="checkbox" name="parameters" value="2" checked>pH
+
+                                        <input type="checkbox" name="parameters" value="3" checked>溶解氧
+
+                                        <input type="checkbox" name="parameters" value="4" checked>电导率
+
+                                        <input type="checkbox" name="parameters" value="5" checked>浊度
+
+                                        <input type="checkbox" name="parameters" value="6" checked>高锰酸盐指数
+
+                                        <input type="checkbox" name="parameters" value="7" checked>氨氮
+
+                                        <input type="checkbox" name="parameters" value="8" checked>总磷
+
+                                        <input type="checkbox" name="parameters" value="9" checked>总氮
+
+                                        <input type="checkbox" name="parameters" value="10" checked>叶绿素α
+
+                                        <input type="checkbox" name="parameters" value="11" checked>藻密度
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td><a href="#">
+                                        <a class="screen-btn" id="start" href="javascript:;">开始</a> </a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">审核结果</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>检测的数据总数</td>
+                                    <td>11456
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>异常数量</td>
+                                    <td>345</td>
+                                </tr>
+                                <tr>
+                                    <td>异常比例</td>
+                                    <td>0.03%</td>
+                                </tr>
+                                <tr>
+                                    <td>检测的数据元素</td>
+                                    <td>
+                                        高锰酸盐指数;氨氮;总磷
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>检测结果</td>
+                                    <td>[ 1., 1., 1., 1., 1., 1., 1., 1., 1., -1., -1., 1., 1.,<br>
+                                        1., 1., 1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1.,<br>
+                                        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
+                                        1., 1., 1., 1., -1., 1., -1., -1., 1., 1., 1., 1., 1.,<br>
+                                        1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1., -1., 1.,<br>
+                                        1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1.,<br>
+                                        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
+                                        1., 1., 1., 1., 1.]<br>
+                                    </td>
+                                </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
