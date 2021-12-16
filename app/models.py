@@ -14,12 +14,23 @@ FORMAT_DATA = '%Y-%m-%d'
 FORMAT_DATA_TIME = '%Y-%m-%d %H:%M:%S'
 
 
+class Project(db.Model):
+    """project table"""
+    __tablename__ = 'project'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=True)
+
+    datas = db.relationship('Data', backref='project')
+    parameter_types = db.relationship('ParameterTypes', backref='project')
+
+
 class Data(db.Model):
     """DATA table"""
     __tablename__ = 'data'
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.DateTime, nullable=True)
+    time = db.Column(db.DateTime, nullable=True)  # 数据上传时间
     is_abnormal = db.Column(db.Boolean, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     abnormals = db.relationship('Abnormal', backref='data')  # 数据和异常建立一对多关系，一条数据对应多个异常
 
@@ -103,7 +114,7 @@ class Data(db.Model):
         """
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).all()
         abnotmal_list = continuous_analysis(p, n)
-        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zero").first().id
         p_list = []
         for x in abnotmal_list:
             x.data.is_abnormal = True
@@ -130,7 +141,7 @@ class Data(db.Model):
         t_time = time()
         abnormal_list = continuous_analysis(p, n)
         print("连续异常检测算法用时%d" % (time() - t_time))
-        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zere").first().id
+        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zero").first().id
         _start_a_id = db.session.execute("select MAX(id) from abnormal").first()[0]
         start_a_id = _start_a_id + 1 if _start_a_id else 1
         p_list = []
@@ -246,16 +257,17 @@ class ParameterTypes(db.Model):
     __tablename__ = 'parameter_types'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
-    unit = db.Column(db.String(64))
+    # unit = db.Column(db.String(64))
     max = db.Column(db.Float, nullable=True)
     min = db.Column(db.Float, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     abnormals = db.relationship('Abnormal', backref='parameter_type')
     parameters = db.relationship('Parameter', backref='parameter_type')
 
-    def __init__(self, name=None, unit=None):
+    def __init__(self, name=None):
         self.name = name
-        self.unit = unit
+        # self.unit = unit
         db.session.add(self)
         db.session.commit()
 

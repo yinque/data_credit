@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 __title__ = ''
-__author__ = 'changxin'
+__author__ = 'ChangXin'
 __mtime__ = '2018/5/15'
 """
 from . import main
@@ -29,7 +29,7 @@ def make_response_dict(code, msg, data):
 
 @main.before_app_first_request
 def create_abnormal_type():
-    types = ["transcendence", "empty", "continuous_not_zere", "continuous_zero", 'kmeans']
+    types = ["transcendence", "empty", "continuous_not_zero", "continuous_zero", 'kmeans']
     continuous_not_zero_standard = {
         'name': '连续异常_非零',
         'description': '参数值连续不变的个数超过设定的连续个数',
@@ -70,14 +70,10 @@ def read_excel(src):
     pts = [x.name for x in ParameterTypes.query.all()]
     pt_list = []
     for x in columns:
-        try:
-            a, b = x.split('(')
-        except ValueError:
-            pass
-        else:
-            b = b.split(")")[0]
-            if a not in pts:
-                pt_list.append(ParameterTypes(name=a, unit=b))
+        if ('时间' in x) or ('time' in x):
+            continue
+        if x not in pts:
+            pt_list.append(ParameterTypes(name=x))
     db.session.add_all(pt_list)
     db.session.commit()
     # 完成数据元素类型建表
@@ -92,14 +88,18 @@ def read_excel(src):
     for x in frame.values:
         c_v = zip(columns, x)
         d_abnormal = False
-        p_abnormal = False
+
         d_list.append(
             {
                 "id": start_d_id,
-                "time": datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'),
+                # "time": datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'),
+                "time": datetime.now(),
                 "is_abnormal": d_abnormal
             })  # 插入一条数据
         for y in c_v:
+            p_abnormal = False
+            if ("时间" in y[0]) or ("time" in y[0]):
+                continue
             value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
             if value is None:
                 d_list[-1]['is_abnormal'] = True
@@ -109,13 +109,13 @@ def read_excel(src):
                     "data_id": start_d_id,
                     "parameter_id": start_p_id,
                     "abnormal_type_id": empty_abnormal_id,
-                    "parameter_type_id": column_dict[y[0].split('(')[0]]})  # 插入一条异常数据到列表
+                    "parameter_type_id": column_dict[y[0]]})  # 插入一条异常数据到列表
                 start_a_id += 1
             p_list.append({
                 "id": start_p_id,
                 "value": value,
                 "data_id": start_d_id,
-                "parameter_type_id": column_dict[y[0].split('(')[0]],
+                "parameter_type_id": column_dict[y[0]],
                 "is_abnormal": p_abnormal})  # 插入一条参数数据
             start_p_id += 1
         start_d_id += 1
@@ -210,11 +210,6 @@ def data_table_result():
 def auto_check_result():
     page = request.args.get('page', 1, type=int)
     _datas = Data.query.filter_by(is_abnormal=True)
-    # if data:
-    #     if 'start_time' in data and 'end_time' in data:
-    #         start_time = datetime.strptime(data['start_time'], FORMAT_DATE)
-    #         end_time = datetime.strptime(data['end_time'], FORMAT_DATE) + timedelta(days=1)
-    #         _datas = _datas.filter(Data.time > start_time).filter(Data.time < end_time)
     pagination = Pagination(_datas.all(), page=page, per_page=10)
     _test = pagination.get_dict()
     return jsonify(_test)
@@ -377,7 +372,6 @@ def kmeans_apply():
     data = request.get_json()
     ids = data['ids'].split(',')
     id_list = [int(x) for x in ids if x.isdigit()]
-    print(id_list)
     p = Parameter.query.filter(Parameter.id.in_(id_list)).all()
     for x in p:
         x.data.is_abnormal = True

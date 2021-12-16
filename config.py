@@ -40,7 +40,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'PRODUCTION_DATABASE_URL') or 'mysql+pymysql://root:p@ssw0rd1@mysqldb:3306/data_credit?charset=utf8mb4'
+        'TEST_DATABASE_URL') or 'mysql+pymysql://root:p@ssw0rd1@localhost:3306/data_credit?charset=utf8mb4'
 
 
 config = {
