@@ -12,7 +12,11 @@
                             <div class="widget-title am-fl">原始数据导入</div>
                         </div>
                         <div class="widget-body am-fr">
-                            <span>上传成功，共上传{{ count }} 条数据</span>
+
+                            <form action="" enctype='multipart/form-data' method='POST'>
+                                <input type="file" name="file">
+                                <input type="submit" value="上传">
+                            </form>
                         </div>
                     </div>
                 </div>

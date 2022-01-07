@@ -19,7 +19,7 @@ class Project(db.Model):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=True)
-
+    describe = db.Column(db.Text, nullable=True)
     datas = db.relationship('Data', backref='project')
     parameter_types = db.relationship('ParameterTypes', backref='project')
 

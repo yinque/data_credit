@@ -41,10 +41,10 @@
                 <ul>
                     <!-- 欢迎语 -->
                     <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a href="#">欢迎你：用户</a>
+                        <a href="#">当前查看的项目为：{{project_name if project_name}}</a>
                     </li>
                     <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a>退出登录</a>
+                        <a></a>
                     </li>
                 </ul>
             </div>
@@ -60,7 +60,7 @@
                 </a>
             </li>
             <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.upload") }}" {% block navigate_upload %}{% endblock %}>
+                <a href="{{ url_for("data_import.index") }}" {% block navigate_upload %}{% endblock %}>
                     <i class="am-icon-home sidebar-nav-link-logo"></i> 原始数据导入
                 </a>
             </li>

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block navigate_upload %}class="active"{% endblock %}
+{% block context %}
+<div class="tpl-content-wrapper">
+    <div class="row-content am-cf">
+        <div class="row">
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+
+                <div class="widget am-cf">
+                    <div class="widget-head am-cf">
+                        <div class="widget-title am-fl">创建项目</div>
+                    </div>
+                    <div class="widget-body am-fr">
+                        <form action="" enctype='multipart/form-data' method='POST'>
+                            <table>
+                                <tr>
+                                    <td>项目名</td>
+                                    <td><input type="text" id="name"></td>
+                                </tr>
+                                <tr>
+                                    <td>项目描述</td>
+                                    <td><textarea rows="6" cols="30" id="desc">填写项目描述</textarea></td>
+                                </tr>
+                                <tr>
+                                    <td><a class="screen-btn" id="create_project" href="javascript:;">创建</a></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+        $("#create_project").click(function () {
+            var name = $("#name").val();
+            var desc = $("#desc").val();
+            var _data = {"name": name,"desc":desc};
+                           $.ajax({
+                                url: '{{ url_for('project.create') }}',
+                                type: 'POST',
+                                data: JSON.stringify(_data),
+                                dataType: 'json',
+                                contentType: 'application/json; charset=utf-8',
+                                success: function (data) {
+                                    window.location.href = data['url'];
+                                },
+                                error: function (xhr) {
+                                    console.error('error');
+                                }
+                            });
+        });
+</script>
+{% endblock %}

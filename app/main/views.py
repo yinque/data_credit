@@ -6,17 +6,15 @@ __author__ = 'ChangXin'
 __mtime__ = '2018/5/15'
 """
 from . import main
-import pandas as pd
+
 from ..models import Data, Parameter, ParameterTypes, AbnormalTypes, Abnormal, CheckStandard
 from app import db
-import re
-from flask import render_template, request, redirect, current_app, url_for, jsonify
-import os
-import uuid
+
+from flask import render_template, request, current_app, jsonify
+
 from datetime import datetime, timedelta
 from app.pagination import Pagination
 from app.algorithm.kmeans import kmeans_analysis
-import time
 
 re_float = r'-?\d+\.?\d*e?-?\d*?'
 FORMAT_DATE = '%Y-%m-%d'
@@ -63,77 +61,9 @@ def create_id_list(start_id, length):
     return [x for x in range(start_id, start_id + length)]
 
 
-def read_excel(src):
-    frame = pd.read_excel(src)
-    columns = frame.columns
-    empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
-    pts = [x.name for x in ParameterTypes.query.all()]
-    pt_list = []
-    for x in columns:
-        if ('时间' in x) or ('time' in x):
-            continue
-        if x not in pts:
-            pt_list.append(ParameterTypes(name=x))
-    db.session.add_all(pt_list)
-    db.session.commit()
-    # 完成数据元素类型建表
-    column_dict = {x.name: x.id for x in ParameterTypes.query.all()}
-    d_list, p_list, ab_list = [], [], []
-    _start_p_id = db.session.execute("select MAX(id) from parameter").first()[0]
-    start_p_id = _start_p_id + 1 if _start_p_id else 1
-    _start_d_id = db.session.execute("select MAX(id) from data").first()[0]
-    start_d_id = _start_d_id + 1 if _start_d_id else 1
-    _start_a_id = db.session.execute("select MAX(id) from abnormal").first()[0]
-    start_a_id = _start_a_id + 1 if _start_a_id else 1
-    for x in frame.values:
-        c_v = zip(columns, x)
-        d_abnormal = False
-
-        d_list.append(
-            {
-                "id": start_d_id,
-                # "time": datetime.strptime(next(c_v)[1], '%Y-%m-%d %H:%M'),
-                "time": datetime.now(),
-                "is_abnormal": d_abnormal
-            })  # 插入一条数据
-        for y in c_v:
-            p_abnormal = False
-            if ("时间" in y[0]) or ("time" in y[0]):
-                continue
-            value = re.findall(re_float, str(y[1]))[0] if not pd.isnull(y[1]) else None
-            if value is None:
-                d_list[-1]['is_abnormal'] = True
-                p_abnormal = True
-                ab_list.append({
-                    "id": start_a_id,
-                    "data_id": start_d_id,
-                    "parameter_id": start_p_id,
-                    "abnormal_type_id": empty_abnormal_id,
-                    "parameter_type_id": column_dict[y[0]]})  # 插入一条异常数据到列表
-                start_a_id += 1
-            p_list.append({
-                "id": start_p_id,
-                "value": value,
-                "data_id": start_d_id,
-                "parameter_type_id": column_dict[y[0]],
-                "is_abnormal": p_abnormal})  # 插入一条参数数据
-            start_p_id += 1
-        start_d_id += 1
-    db.session.execute(Data.__table__.insert(), d_list)
-    db.session.execute(Parameter.__table__.insert(), p_list)
-    db.session.execute(Abnormal.__table__.insert(), ab_list)
-    db.session.commit()
-    return len(d_list), [x["id"] for x in d_list]
-
-
 @main.route('/')
 def index():
     return render_template('index.html')
-
-
-# @main.route('/test_auto_deploy')
-# def test_auto_deploy():
-#     return "test 2 success"
 
 
 @main.route('/auto_check')
@@ -149,31 +79,6 @@ def auto_check():
         for x in p_types_id:
             data.sort_para.append(p_t_dict[x])
     return render_template('auto_check.html', p_types=p_types, pagination=pagination, datas=datas)
-
-
-@main.route('/upload', methods=['POST', 'GET'])
-def upload():
-    if request.method == 'POST':
-        s_time = time.time()
-        file = request.files['file']
-        new_filename = uuid.uuid4().hex + '.' + file.filename.split('.')[-1]
-        file_path = os.path.join(current_app.config['UPLOAD_PATH'], new_filename)
-        file.save(file_path)
-        count, data_id_list = read_excel(file_path)
-        u_time = time.time()
-        para_type_id_list = [x.id for x in ParameterTypes.query.all()]
-        for x in para_type_id_list:
-            Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
-                                           data_id_list)
-        end_time = time.time()
-        print("创建数据共用时%d,本次上传用时%d秒" % (u_time - s_time, end_time - s_time))
-        return redirect(url_for('main.upload_success', count=count))
-    return render_template('upload.html')
-
-
-@main.route('/upload_success/<int:count>')
-def upload_success(count):
-    return render_template('upload_success.html', count=count)
 
 
 @main.route('/data_table')
@@ -262,9 +167,6 @@ def manual_check_result():
             else:
                 a_list = AbnormalTypes.query.filter_by(name=data['abnormal_type']).first().abnormals
                 _datas = _datas.join(Data.abnormals).filter(Abnormal.id.in_(x.id for x in a_list))
-        # if 'paras' in data:
-        #     a_list = AbnormalTypes.query.filter(Abnormal.parameter_type_id.in_([int(x) for x in data['paras']])).all()
-        #     _datas = _datas.join(Data.abnormals).filter(Abnormal.id.in_(x.id for x in a_list))
     pagination = Pagination(_datas.all(), page=page, per_page=10)
     _test = pagination.get_dict()
     return jsonify(_test)

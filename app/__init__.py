@@ -25,4 +25,10 @@ def create_app(config_name):
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    from .data_import import data_import as data_import_blueprint
+    app.register_blueprint(data_import_blueprint, url_prefix='/data_import')
+
+    from .project import project as project_blueprint
+    app.register_blueprint(project_blueprint, url_prefix='/project')
+
     return app
