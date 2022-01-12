@@ -6,7 +6,7 @@ __author__ = 'changxin'
 __mtime__ = '2018/5/15'
 """
 from app import db
-from .algorithm.continuous import continuous_analysis
+from .algorithm.continuous import continuous_analysis, continuous_zeros_analysis
 from flask import url_for
 from time import time
 
@@ -136,18 +136,14 @@ class Data(db.Model):
         :param n:
         :return:
         """
-        s_time = time()
         p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
-        t_time = time()
         abnormal_list = continuous_analysis(p, n)
-        print("连续异常检测算法用时%d" % (time() - t_time))
         abnormal_id = AbnormalTypes.query.filter_by(name="continuous_not_zero").first().id
         _start_a_id = db.session.execute("select MAX(id) from abnormal").first()[0]
         start_a_id = _start_a_id + 1 if _start_a_id else 1
         p_list = []
         d_list = []
         ab_list = []
-        create_time = time()
         for x in abnormal_list:
             p_list.append(x.id)
             d_list.append(x.data_id)
@@ -158,17 +154,43 @@ class Data(db.Model):
                 "abnormal_type_id": abnormal_id,
                 "parameter_type_id": para_type_id})
             start_a_id += 1
-        c_time = time()
-        print("参数表长度%d" % len(p_list))
-        print("数据表长度%d" % len(d_list))
         if len(abnormal_list):
             db.session.execute("update parameter set is_abnormal = 1 where id in " + "(" + str(p_list)[1:-1] + ")")
             db.session.execute("update data set is_abnormal = 1 where id in " + "(" + str(d_list)[1:-1] + ")")
             db.session.execute(Abnormal.__table__.insert(), ab_list)
             db.session.commit()
-        end_time = time()
-        print("提取异常用时%d,连续值检测插入用时%d，异常元素创建用时%d秒，连续检测共用时%d" % (
-            (t_time - s_time), (end_time - c_time), (c_time - create_time), (end_time - s_time)))
+
+    @staticmethod
+    def continuous_zero_analysis_range(para_type_id: int, n: int, datas_id: list):
+        """
+        对参数类型符合para_type_id的数据进行连续异常分析
+        :param para_type_id:
+        :param n:
+        :return:
+        """
+        p = Parameter.query.filter_by(parameter_type_id=para_type_id).filter(Parameter.data_id.in_(datas_id)).all()
+        abnormal_list = continuous_zeros_analysis(p, n)
+        abnormal_id = AbnormalTypes.query.filter_by(name="continuous_zero").first().id
+        _start_a_id = db.session.execute("select MAX(id) from abnormal").first()[0]
+        start_a_id = _start_a_id + 1 if _start_a_id else 1
+        p_list = []
+        d_list = []
+        ab_list = []
+        for x in abnormal_list:
+            p_list.append(x.id)
+            d_list.append(x.data_id)
+            ab_list.append({
+                "id": start_a_id,
+                "data_id": x.data_id,
+                "parameter_id": x.id,
+                "abnormal_type_id": abnormal_id,
+                "parameter_type_id": para_type_id})
+            start_a_id += 1
+        if len(abnormal_list):
+            db.session.execute("update parameter set is_abnormal = 1 where id in " + "(" + str(p_list)[1:-1] + ")")
+            db.session.execute("update data set is_abnormal = 1 where id in " + "(" + str(d_list)[1:-1] + ")")
+            db.session.execute(Abnormal.__table__.insert(), ab_list)
+            db.session.commit()
 
     def get_para_tuple(self, para_type_id_list: list):
         l = []
@@ -229,12 +251,19 @@ class Parameter(db.Model):
         else:
             return False
 
-    def transcendence(self, top: float, bottom: float):
-        if (top is not None and (self.value is not None and self.value < bottom)) or (
-                bottom is not None and (self.value is not None and self.value < bottom)):
-            return True
-        else:
-            return False
+    def transcendence(self):
+        _min = self.parameter_type.min
+        _max = self.parameter_type.max
+        if _min is not None and _max is not None:
+            if self.value is not None and (self.value < _min or self.value > _max):
+                return True
+        elif _min is not None:
+            if self.value is not None and (self.value < _min):
+                return True
+        elif _max is not None:
+            if self.value is not None and (self.value > _max):
+                return True
+        return False
 
     @property
     def show_dict(self):

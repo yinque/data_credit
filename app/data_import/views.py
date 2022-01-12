@@ -103,33 +103,33 @@ def read_excel(src, pid):
 @data_import.route('excel/<int:pid>', methods=['POST', 'GET'])
 def excel(pid):
     if request.method == 'POST':
-        s_time = time.time()
+        p = Project.query.get(pid)
+        new = True if len(p.parameter_types) == 0 else False
         file = request.files['file']
         new_filename = uuid.uuid4().hex + '.' + file.filename.split('.')[-1]
         file_path = os.path.join(current_app.config['UPLOAD_PATH'], new_filename)
         file.save(file_path)
         count, data_id_list = read_excel(file_path, pid)
-        u_time = time.time()
-        para_type_id_list = [x.id for x in ParameterTypes.query.all()]
-        for x in para_type_id_list:
-            Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
-                                           data_id_list)
-        end_time = time.time()
-        print("创建数据共用时%d,本次上传用时%d秒" % (u_time - s_time, end_time - s_time))
-        # return redirect(url_for('data_import.upload_success', count=count))
-        return redirect(url_for('data_import.set_range', pid=pid))
+        start_data_id = min(data_id_list)
+        end_data_id = max(data_id_list)
+        if new:
+            return redirect(
+                url_for('data_import.set_range', pid=pid, start_data_id=start_data_id, end_data_id=end_data_id))
+        else:
+            return redirect(
+                url_for('data_import.upload_success', pid=pid, start_data_id=start_data_id, end_data_id=end_data_id))
     return render_template('/data_import/upload.html', pid=pid)
 
 
-@data_import.route('set_range/<int:pid>', methods=['POST', 'GET'])
-def set_range(pid):
+@data_import.route('set_range/<int:pid>/<int:start_data_id>/<int:end_data_id>/', methods=['POST', 'GET'])
+def set_range(pid, start_data_id, end_data_id):
     if request.method == "POST":
         data = request.get_json()
         pts = data['para_types']
         for x in pts:
             _pt = ParameterTypes.query.get_or_404(int(x['id']))
-            _max = float(x['max']) if x['max'] != "None" else None
-            _min = float(x['min']) if x['max'] != "None" else None
+            _max = float(x['max']) if x['max'] != "未设置" else None
+            _min = float(x['min']) if x['max'] != "未设置" else None
             if _min is not None and _max is not None:
                 if _min < _max:
                     _pt.max = _max
@@ -143,15 +143,38 @@ def set_range(pid):
                 if _max > _pt.min or _pt.min is None:
                     _pt.max = _max
                     db.session.add(_pt)
+        _zero = data['zero']
+        _not_zero = data['not_zero']
+        print(_zero)
+        print(_not_zero)
+        zero = CheckStandard.query.filter_by(name='连续异常_零值').first()
+        not_zero = CheckStandard.query.filter_by(name='连续异常_非零').first()
+        zero.value = _zero
+        not_zero.value = _not_zero
+        db.session.add(zero)
+        db.session.add(not_zero)
         db.session.commit()
-        new_url = url_for('data_import.upload_success', pid=pid)
+        new_url = url_for('data_import.upload_success', pid=pid, start_data_id=start_data_id, end_data_id=end_data_id)
         return jsonify(make_response_dict(200, "set successful", new_url))
+    zero = CheckStandard.query.filter_by(name='连续异常_零值').first()
+    not_zero = CheckStandard.query.filter_by(name='连续异常_非零').first()
     paras = ParameterTypes.query.filter_by(project_id=pid).all()
-    return render_template('/data_import/set_range.html', paras=paras, pid=pid)
+    return render_template('/data_import/set_range.html', paras=paras, pid=pid, zero=zero, not_zero=not_zero,
+                           start_data_id=start_data_id, end_data_id=end_data_id)
 
 
-@data_import.route('/upload_success/<int:pid>')
-def upload_success(pid):
+@data_import.route('/upload_success/<int:pid>/<int:start_data_id>/<int:end_data_id>/')
+def upload_success(pid, start_data_id, end_data_id):
+    s_time = time.time()
+    datas = Data.query.filter(Data.id > start_data_id).filter(Data.id < end_data_id).all()
+    data_id_list = [x.id for x in datas]
+    para_type_id_list = [x.id for x in ParameterTypes.query.all()]
+    for x in para_type_id_list:
+        Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
+                                       data_id_list)
+    for x in para_type_id_list:
+        Data.continuous_zero_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_零值').first().value),
+                                       data_id_list)
     abnormal_id = AbnormalTypes.query.filter_by(name="transcendence").first().id
     p = Project.query.get(pid)
     pts = p.parameter_types
@@ -160,39 +183,44 @@ def upload_success(pid):
         _max = x.max
         if _min is not None and _max is not None:
             for y in x.parameters:
-                if y.value is not None and (y.value < _min or y.value > _max):
-                    y.is_abnormal = True
-                    y.data.is_abnormal = True
-                    _a = Abnormal()
-                    _a.data_id = y.data.id
-                    _a.abnormal_type_id = abnormal_id
-                    _a.parameter_type_id = x.id
-                    _a.parameter_id = y.id
-                    db.session.add(y)
-                    db.session.add(_a)
+                if y.data_id in data_id_list:
+                    if y.value is not None and (y.value < _min or y.value > _max):
+                        y.is_abnormal = True
+                        y.data.is_abnormal = True
+                        _a = Abnormal()
+                        _a.data_id = y.data.id
+                        _a.abnormal_type_id = abnormal_id
+                        _a.parameter_type_id = x.id
+                        _a.parameter_id = y.id
+                        db.session.add(y)
+                        db.session.add(_a)
         elif _min is not None:
             for y in x.parameters:
-                if y.value is not None and (y.value < _min):
-                    y.is_abnormal = True
-                    y.data.is_abnormal = True
-                    _a = Abnormal()
-                    _a.data_id = y.data.id
-                    _a.abnormal_type_id = abnormal_id
-                    _a.parameter_type_id = x.id
-                    _a.parameter_id = y.id
-                    db.session.add(y)
-                    db.session.add(_a)
+                if y.data_id in data_id_list:
+                    if y.value is not None and (y.value < _min):
+                        y.is_abnormal = True
+                        y.data.is_abnormal = True
+                        _a = Abnormal()
+                        _a.data_id = y.data.id
+                        _a.abnormal_type_id = abnormal_id
+                        _a.parameter_type_id = x.id
+                        _a.parameter_id = y.id
+                        db.session.add(y)
+                        db.session.add(_a)
         elif _max is not None:
             for y in x.parameters:
-                if y.value is not None and (y.value > _max):
-                    y.is_abnormal = True
-                    y.data.is_abnormal = True
-                    _a = Abnormal()
-                    _a.data_id = y.data.id
-                    _a.abnormal_type_id = abnormal_id
-                    _a.parameter_type_id = x.id
-                    _a.parameter_id = y.id
-                    db.session.add(y)
-                    db.session.add(_a)
+                if y.data_id in data_id_list:
+                    if y.value is not None and (y.value > _max):
+                        y.is_abnormal = True
+                        y.data.is_abnormal = True
+                        _a = Abnormal()
+                        _a.data_id = y.data.id
+                        _a.abnormal_type_id = abnormal_id
+                        _a.parameter_type_id = x.id
+                        _a.parameter_id = y.id
+                        db.session.add(y)
+                        db.session.add(_a)
     db.session.commit()
+    end_time = time.time()
+    print("本次上传用时%d秒" % (end_time - s_time))
     return render_template('/data_import/upload_success.html')

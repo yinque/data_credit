@@ -9,7 +9,7 @@
 
                 <div class="widget am-cf">
                     <div class="widget-head am-cf">
-                        <div style="text-align:center" class="widget-title am-fl">参数范围设置</div>
+                        <div style="text-align:center" class="widget-title am-fl">审核参数设置</div>
                     </div>
                     <div class="widget-body am-fr">
                         <table width="100%"
@@ -26,16 +26,42 @@
                             {% for x in paras %}
                             <tr class="gradeX" id="pt_{{x.id}}">
                                 <td>{{ x.name }}</td>
-                                <td><input id="min_{{ x.id }}" type="text" value="{{ x.min }}"></td>
-                                <td><input id="max_{{ x.id }}" type="text" value="{{ x.max }}"></td>
+                                <td><input id="min_{{ x.id }}" type="text" value="{{ x.min if x.min else "未设置" }}"></td>
+                                <td><input id="max_{{ x.id }}" type="text" value="{{ x.max if x.min else "未设置" }}"></td>
                                 </td>
                             </tr>
                             {% endfor %}
-                            <tr>
-                                <td><a class="screen-btn" id="submit" href="javascript:">提交</a>
-                            </tr>
+
 
                             </tbody>
+                            <div class="widget-body am-fr">
+                                <table width="100%"
+                                       class="am-table am-table-compact am-table-striped tpl-table-black"
+                                       id="example-r">
+                                    <thead class="t-thead">
+                                    <tr>
+                                        <th>参数类型名称</th>
+                                        <th>异常类型说明</th>
+                                        <th>审核标准</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-content">
+                                    <tr class="gradeX">
+                                        <td>{{ not_zero.name }}</td>
+                                        <td>{{ not_zero.description }}</td>
+                                        <td>连续<input id="con_not_zero" type="text" value="{{ not_zero.value }}">次</td>
+                                    </tr>
+                                    <tr class="gradeX">
+                                        <td>{{ zero.name }}</td>
+                                        <td>{{ zero.description }}</td>
+                                        <td>连续<input id="con_zero" type="text" value="{{ zero.value }}">次</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="screen-btn" id="submit" href="javascript:">提交</a>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </table>
                     </div>
                 </div>
@@ -58,9 +84,10 @@
                 _p['min'] = document.getElementById("min_"+ids[i]).value;
                 _p['id'] = ids[i];
                 _data['para_types'].push(_p)};
-                console.log(_data)
+                _data['zero']=document.getElementById("con_zero").value;
+                _data['not_zero']=document.getElementById("con_not_zero").value;
                 $.ajax({
-                    url: '{{url_for('data_import.set_range', pid=pid)}}',
+                    url: '{{url_for('data_import.set_range', pid=pid,start_data_id=start_data_id,end_data_id=end_data_id)}}',
                     type: 'POST',
                     data: JSON.stringify(_data),
                     dataType: 'json',
@@ -73,6 +100,5 @@
                     }
                 });
             });
-
 </script>
 {% endblock %}
