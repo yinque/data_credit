@@ -22,6 +22,7 @@ class Project(db.Model):
     describe = db.Column(db.Text, nullable=True)
     datas = db.relationship('Data', backref='project')
     parameter_types = db.relationship('ParameterTypes', backref='project')
+    check_standards = db.relationship('CheckStandard', backref='project')
 
 
 class Data(db.Model):
@@ -308,10 +309,12 @@ class CheckStandard(db.Model):
     name = db.Column(db.String(64), nullable=True)
     description = db.Column(db.Text, nullable=True)
     value = db.Column(db.Float, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
-    def __init__(self, name, description, value):
+    def __init__(self, name, description, value, project_id):
         self.name = name
         self.description = description
         self.value = value
-        db.session.add(self)
-        db.session.commit()
+        self.project_id = project_id
+        # db.session.add(self)
+        # db.session.commit()

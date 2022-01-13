@@ -169,11 +169,13 @@ def upload_success(pid, start_data_id, end_data_id):
     data_id_list = [x.id for x in datas]
     para_type_id_list = [x.id for x in ParameterTypes.query.all()]
     for x in para_type_id_list:
-        Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').first().value),
+        Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').filter(
+            CheckStandard.project_id == pid).first().value),
                                        data_id_list)
     for x in para_type_id_list:
-        Data.continuous_zero_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_零值').first().value),
-                                       data_id_list)
+        Data.continuous_zero_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_零值').filter(
+            CheckStandard.project_id == pid).first().value),
+                                            data_id_list)
     abnormal_id = AbnormalTypes.query.filter_by(name="transcendence").first().id
     p = Project.query.get(pid)
     pts = p.parameter_types

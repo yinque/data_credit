@@ -222,17 +222,21 @@ def expert_rule_setup():
 
 
 @main.route('/abnormal_rule_alert', methods=["POST", "GET"])
+@current_project_check()
 def abnormal_rule_alert():
     # 异常审核标准修改
     if request.method == "POST":
         data = request.get_json()
-        c = CheckStandard.query.filter_by(name=data['name']).first()
+        c = CheckStandard.query.filter_by(name=data['name']).filter(
+            CheckStandard.project_id == current_app.config['current_project']['id']).first()
         c.value = float(data['value'])
         db.session.add(c)
         db.session.commit()
         return jsonify(make_response_dict(200, "alert successful", "alert successful"))
-    zero = CheckStandard.query.filter_by(name='连续异常_零值').first()
-    not_zero = CheckStandard.query.filter_by(name='连续异常_非零').first()
+    zero = CheckStandard.query.filter_by(name='连续异常_零值').filter(
+        CheckStandard.project_id == current_app.config['current_project']['id']).first()
+    not_zero = CheckStandard.query.filter_by(name='连续异常_非零').filter(
+        CheckStandard.project_id == current_app.config['current_project']['id']).first()
     return render_template('abnormal_rule_alert.html', zero=zero, not_zero=not_zero)
 
 
