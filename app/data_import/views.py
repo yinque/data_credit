@@ -35,10 +35,11 @@ def form(pid):
 
 
 def read_excel(src, pid):
+    p = Project.query.get_or_404(pid)
     frame = pd.read_excel(src)
     columns = frame.columns
     empty_abnormal_id = AbnormalTypes.query.filter_by(name="empty").first().id
-    pts = [x.name for x in ParameterTypes.query.all()]
+    pts = [x.name for x in p.parameter_types]
     pt_list = []
     for x in columns:
         if ('时间' in x) or ('time' in x):
@@ -50,7 +51,6 @@ def read_excel(src, pid):
     db.session.add_all(pt_list)
     db.session.commit()
     # 完成数据元素类型建表
-    p = Project.query.get_or_404(pid)
     column_dict = {x.name: x.id for x in p.parameter_types}
     d_list, p_list, ab_list = [], [], []
     _start_p_id = db.session.execute("select MAX(id) from parameter").first()[0]
@@ -165,7 +165,6 @@ def set_range(pid, start_data_id, end_data_id):
 
 @data_import.route('/upload_success/<int:pid>/<int:start_data_id>/<int:end_data_id>/')
 def upload_success(pid, start_data_id, end_data_id):
-    s_time = time.time()
     datas = Data.query.filter(Data.id > start_data_id).filter(Data.id < end_data_id).all()
     data_id_list = [x.id for x in datas]
     para_type_id_list = [x.id for x in ParameterTypes.query.all()]
@@ -221,6 +220,4 @@ def upload_success(pid, start_data_id, end_data_id):
                         db.session.add(y)
                         db.session.add(_a)
     db.session.commit()
-    end_time = time.time()
-    print("本次上传用时%d秒" % (end_time - s_time))
     return render_template('/data_import/upload_success.html')

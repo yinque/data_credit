@@ -16,6 +16,7 @@ manager = Manager(app)
 migrate = Migrate(app, db)
 
 
+
 def reset_data():
     db.drop_all()
     db.create_all()

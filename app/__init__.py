@@ -5,11 +5,15 @@ __title__ = ''
 __author__ = 'changxin'
 __mtime__ = '2018/5/15'
 """
-from flask import Flask
+from flask import Flask, session, current_app
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 
 db = SQLAlchemy()
+
+
+def get_current_project():
+    return current_app.config['current_project']
 
 
 def create_app(config_name):
@@ -18,6 +22,8 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     db.init_app(app)
+
+    app.add_template_global(get_current_project, 'current_project')
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

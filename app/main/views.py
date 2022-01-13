@@ -7,11 +7,11 @@ __mtime__ = '2018/5/15'
 """
 from . import main
 
-from ..models import Data, Parameter, ParameterTypes, AbnormalTypes, Abnormal, CheckStandard
+from ..models import Data, Parameter, ParameterTypes, AbnormalTypes, Abnormal, CheckStandard, Project
 from app import db
 
 from flask import render_template, request, current_app, jsonify
-
+from ..current_project_check import current_project_check
 from datetime import datetime, timedelta
 from app.pagination import Pagination
 from app.algorithm.kmeans import kmeans_analysis
@@ -25,28 +25,14 @@ def make_response_dict(code, msg, data):
     return {'code': code, 'msg': msg, 'data': data}
 
 
+@main.app_errorhandler(412)
+def not_set_current_project(e):
+    return render_template('/error/412.html'), 412
+
+
 @main.before_app_first_request
 def create_abnormal_type():
     types = ["transcendence", "empty", "continuous_not_zero", "continuous_zero", 'kmeans']
-    continuous_not_zero_standard = {
-        'name': '连续异常_非零',
-        'description': '参数值连续不变的个数超过设定的连续个数',
-        'value': 5.0,
-
-    }
-    continuous_zero_standard = {
-        'name': '连续异常_零值',
-        'description': '参数值连续为0的连续个数',
-        'value': 5.0,
-    }
-    if not CheckStandard.query.filter_by(name='连续异常_非零').first():
-        db.session.add(CheckStandard(name=continuous_not_zero_standard['name'],
-                                     description=continuous_not_zero_standard['description'],
-                                     value=continuous_not_zero_standard['value']))
-    if not CheckStandard.query.filter_by(name='连续异常_零值').first():
-        db.session.add(
-            CheckStandard(name=continuous_zero_standard['name'], description=continuous_zero_standard['description'],
-                          value=continuous_zero_standard['value']))
     for x in types:
         t = AbnormalTypes.query.filter_by(name=x).first()
         if not t:
@@ -55,6 +41,7 @@ def create_abnormal_type():
             db.session.add(t)
     db.session.commit()
     current_app.config['abnormal_types'] = {x.name: x.id for x in AbnormalTypes.query.all()}
+    current_app.config['current_project'] = None
 
 
 def create_id_list(start_id, length):
@@ -66,12 +53,29 @@ def index():
     return render_template('index.html')
 
 
+@main.route('/set_current_project')
+def set_current_project():
+    p = Project.query.all()
+    return render_template('/project/set_current_project.html', p=p)
+
+
+@main.route('/set_project/<int:pid>')
+def set_project(pid):
+    p = Project.query.get_or_404(pid)
+    _p = {'id': p.id, 'name': p.name, 'describe': p.describe}
+    current_app.config['current_project'] = _p
+    return render_template('/project/set_success.html')
+
+
 @main.route('/auto_check')
+@current_project_check()
 def auto_check():
-    p_types = ParameterTypes.query.all()
+    p = Project.query.get(current_app.config['current_project']['id'])
+    p_types = p.parameter_types
     p_types_id = [x.id for x in p_types]
     page = request.args.get('page', 1, type=int)
-    pagination = Data.query.filter_by(is_abnormal=True).paginate(page, per_page=10, error_out=False)
+    pagination = Data.query.filter(Data.project_id == p.id).filter_by(is_abnormal=True).paginate(page, per_page=10,
+                                                                                                 error_out=False)
     datas = pagination.items
     for data in datas:
         data.sort_para = []
@@ -82,11 +86,13 @@ def auto_check():
 
 
 @main.route('/data_table')
+@current_project_check()
 def data_table():
-    p_types = ParameterTypes.query.all()
+    p = Project.query.get(current_app.config['current_project']['id'])
+    p_types = p.parameter_types
     p_types_id = [x.id for x in p_types]
     page = request.args.get('page', 1, type=int)
-    pagination = Data.query.paginate(page, per_page=10, error_out=False)
+    pagination = Data.query.filter(Data.project_id == p.id).paginate(page, per_page=10, error_out=False)
     datas = pagination.items
     for data in datas:
         data.sort_para = []
@@ -97,10 +103,11 @@ def data_table():
 
 
 @main.route('/data_table_result', methods=['get', 'post'])
+@current_project_check()
 def data_table_result():
     data = request.get_json()
     page = request.args.get('page', 1, type=int)
-    _datas = Data.query
+    _datas = Data.query.filter(Data.project_id == current_app.config['current_project']['id'])
     if data:
         if 'start_time' in data and 'end_time' in data:
             start_time = datetime.strptime(data['start_time'], FORMAT_DATE)
@@ -112,9 +119,11 @@ def data_table_result():
 
 
 @main.route('/auto_check_result', methods=['get', 'post'])
+@current_project_check()
 def auto_check_result():
+    p = Project.query.get(current_app.config['current_project']['id'])
     page = request.args.get('page', 1, type=int)
-    _datas = Data.query.filter_by(is_abnormal=True)
+    _datas = Data.query.filter(Data.project_id == p.id).filter_by(is_abnormal=True)
     pagination = Pagination(_datas.all(), page=page, per_page=10)
     _test = pagination.get_dict()
     return jsonify(_test)
@@ -127,11 +136,14 @@ def abnormal_detail(a_id, page):
 
 
 @main.route('/manual_check')
+@current_project_check()
 def manual_check():
-    p_types = ParameterTypes.query.all()
+    p = Project.query.get(current_app.config['current_project']['id'])
+    p_types = p.parameter_types
     p_types_id = [x.id for x in p_types]
     page = request.args.get('page', 1, type=int)
-    pagination = Data.query.filter_by(is_abnormal=True).paginate(page, per_page=10, error_out=False)
+    pagination = Data.query.filter(Data.project_id == p.id).filter_by(is_abnormal=True).paginate(page, per_page=10,
+                                                                                                 error_out=False)
     datas = pagination.items
     for data in datas:
         data.sort_para = []
@@ -144,11 +156,12 @@ def manual_check():
 
 
 @main.route('/manual_check_result', methods=['get', 'post'])
+@current_project_check()
 def manual_check_result():
+    p = Project.query.get(current_app.config['current_project']['id'])
     data = request.get_json()
     page = request.args.get('page', 1, type=int)
-    # _datas = Data.query.filter_by(is_abnormal=True)
-    _datas = Data.query
+    _datas = Data.query.filter(Data.project_id == p.id)
     if data:
         if 'check_type' in data:
             if data['check_type'] == 'all':
@@ -179,6 +192,7 @@ def manual_detail(a_id, page):
 
 
 @main.route('/manual_alert/<int:p_id>', methods=["POST", "GET"])
+@current_project_check()
 def manual_alert(p_id):
     p = Parameter.query.get_or_404(p_id)
     if request.method == "POST":
@@ -193,7 +207,8 @@ def manual_alert(p_id):
         return jsonify(make_response_dict(200, "alert successful", "alert successful"))
     today = datetime(year=p.data.time.year, month=p.data.time.month, day=p.data.time.day)
     tomorrow = today + timedelta(days=1)
-    datas = Data.query.filter(Data.time > today).filter(Data.time < tomorrow).all()
+    datas = Data.query.filter(Data.project_id == current_app.config['current_project']['id']).filter(
+        Data.time > today).filter(Data.time < tomorrow).all()
     datas_ids = [x.id for x in datas]
     paras = Parameter.query.filter(Parameter.data_id.in_(datas_ids)).filter(
         Parameter.parameter_type_id == p.parameter_type_id).all()
@@ -208,6 +223,7 @@ def expert_rule_setup():
 
 @main.route('/abnormal_rule_alert', methods=["POST", "GET"])
 def abnormal_rule_alert():
+    # 异常审核标准修改
     if request.method == "POST":
         data = request.get_json()
         c = CheckStandard.query.filter_by(name=data['name']).first()
@@ -221,7 +237,9 @@ def abnormal_rule_alert():
 
 
 @main.route('/parameter_range_alert', methods=["POST", "GET"])
+@current_project_check()
 def parameter_range_alert():
+    project = Project.query.get(current_app.config['current_project']['id'])
     if request.method == "POST":
         data = request.get_json()
         id = int(data['id'])
@@ -231,7 +249,7 @@ def parameter_range_alert():
         db.session.add(para_type)
         db.session.commit()
         return jsonify(make_response_dict(200, "alert successful", "alert successful"))
-    paras = ParameterTypes.query.all()
+    paras = project.parameter_types
     return render_template('parameter_range_alert.html', paras=paras)
 
 
@@ -244,45 +262,46 @@ def intelligent_check():
 def intelligent_rule_setup():
     return render_template('intelligent_rule_setup.html')
 
-
-@main.route('/intelligent_kmeans')
-def intelligent_kmeans():
-    p_types = ParameterTypes.query.all()
-    id_max = Data.query.count()
-    return render_template('intelligent_kmeans.html', p_types=p_types, id_max=id_max)
-
-
-@main.route('/intelligent_kmeans_result')
-def intelligent_kmeans_result():
-    return render_template('intelligent_kmeans_result.html')
-
-
-@main.route('/kmeans', methods=["POST"])
-def kmeans():
-    data = request.get_json()
-    datas = Data.query.filter(Data.id >= data['id_start']).filter(Data.id <= data['id_end']).all()
-    datas_id = [x.id for x in datas]
-    para_list = Parameter.query.filter_by(parameter_type_id=int(data['para_type'])).filter(
-        Parameter.data_id.in_(datas_id)).all()
-    a_l, cluster_dict = kmeans_analysis(para_list=para_list, k=int(data['k']), i=int(data['i']), j=int(data['j']))
-    cluster_dict['k'] = int(data['k'])
-    return jsonify(make_response_dict(200, "analysis successful", cluster_dict))
-
-
-@main.route('/kmeans_apply', methods=["POST"])
-def kmeans_apply():
-    data = request.get_json()
-    ids = data['ids'].split(',')
-    id_list = [int(x) for x in ids if x.isdigit()]
-    p = Parameter.query.filter(Parameter.id.in_(id_list)).all()
-    for x in p:
-        x.data.is_abnormal = True
-        x.is_abnormal = True
-        _n = Abnormal()
-        _n.parameter_id = x.id
-        _n.abnormal_type_id = AbnormalTypes.query.filter_by(name="kmeans").first().id
-        _n.parameter_type_id = x.parameter_type_id
-        x.data.abnormals.append(_n)
-        db.session.add(x)
-    db.session.commit()
-    return jsonify(make_response_dict(200, "apply successful", "apply successful"))
+#
+#
+# @main.route('/intelligent_kmeans')
+# def intelligent_kmeans():
+#     p_types = ParameterTypes.query.all()
+#     id_max = Data.query.count()
+#     return render_template('intelligent_kmeans.html', p_types=p_types, id_max=id_max)
+#
+#
+# @main.route('/intelligent_kmeans_result')
+# def intelligent_kmeans_result():
+#     return render_template('intelligent_kmeans_result.html')
+#
+#
+# @main.route('/kmeans', methods=["POST"])
+# def kmeans():
+#     data = request.get_json()
+#     datas = Data.query.filter(Data.id >= data['id_start']).filter(Data.id <= data['id_end']).all()
+#     datas_id = [x.id for x in datas]
+#     para_list = Parameter.query.filter_by(parameter_type_id=int(data['para_type'])).filter(
+#         Parameter.data_id.in_(datas_id)).all()
+#     a_l, cluster_dict = kmeans_analysis(para_list=para_list, k=int(data['k']), i=int(data['i']), j=int(data['j']))
+#     cluster_dict['k'] = int(data['k'])
+#     return jsonify(make_response_dict(200, "analysis successful", cluster_dict))
+#
+#
+# @main.route('/kmeans_apply', methods=["POST"])
+# def kmeans_apply():
+#     data = request.get_json()
+#     ids = data['ids'].split(',')
+#     id_list = [int(x) for x in ids if x.isdigit()]
+#     p = Parameter.query.filter(Parameter.id.in_(id_list)).all()
+#     for x in p:
+#         x.data.is_abnormal = True
+#         x.is_abnormal = True
+#         _n = Abnormal()
+#         _n.parameter_id = x.id
+#         _n.abnormal_type_id = AbnormalTypes.query.filter_by(name="kmeans").first().id
+#         _n.parameter_type_id = x.parameter_type_id
+#         x.data.abnormals.append(_n)
+#         db.session.add(x)
+#     db.session.commit()
+#     return jsonify(make_response_dict(200, "apply successful", "apply successful"))

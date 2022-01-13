@@ -8,7 +8,7 @@ __mtime__ = '2018/5/15'
 from . import project
 from flask import render_template, request, url_for, jsonify
 from app import db
-from ..models import Project
+from ..models import Project,CheckStandard
 
 
 @project.route('/create', methods=['POST', 'GET'])
@@ -18,6 +18,26 @@ def create():
         p = Project()
         p.name = data['name']
         p.describe = data['desc']
+        continuous_not_zero_standard = {
+            'name': '连续异常_非零',
+            'description': '参数值连续不变的个数超过设定的连续个数',
+            'value': 5.0,
+
+        }
+        continuous_zero_standard = {
+            'name': '连续异常_零值',
+            'description': '参数值连续为0的连续个数',
+            'value': 5.0,
+        }
+        if not CheckStandard.query.filter_by(name='连续异常_非零').first():
+            db.session.add(CheckStandard(name=continuous_not_zero_standard['name'],
+                                         description=continuous_not_zero_standard['description'],
+                                         value=continuous_not_zero_standard['value']))
+        if not CheckStandard.query.filter_by(name='连续异常_零值').first():
+            db.session.add(
+                CheckStandard(name=continuous_zero_standard['name'],
+                              description=continuous_zero_standard['description'],
+                              value=continuous_zero_standard['value']))
         db.session.add(p)
         db.session.commit()
         return jsonify({"url": url_for('data_import.index')})

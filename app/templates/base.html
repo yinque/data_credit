@@ -41,7 +41,7 @@
                 <ul>
                     <!-- 欢迎语 -->
                     <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a href="#">当前查看的项目为：{{project_name if project_name}}</a>
+                        <a href="#">当前查看的项目：{{current_project()['name'] if current_project() else "未设置"}}</a>
                     </li>
                     <li class="am-text-sm tpl-header-navbar-welcome">
                         <a></a>

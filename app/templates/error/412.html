@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block navigate_index %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">您未设置要查看的项目，请点击下方连接进行设置后重试</div>
+                        </div>
+                        <div class="widget-body am-fr">
+
+                            <div class="widget-title am-fl"><a href="{{url_for("main.set_current_project")}}">点击设置要查看的项目</a></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
