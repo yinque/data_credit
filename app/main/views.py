@@ -14,7 +14,7 @@ from flask import render_template, request, current_app, jsonify
 from ..current_project_check import current_project_check
 from datetime import datetime, timedelta
 from app.pagination import Pagination
-from app.algorithm.kmeans import kmeans_analysis
+
 
 re_float = r'-?\d+\.?\d*e?-?\d*?'
 FORMAT_DATE = '%Y-%m-%d'
@@ -257,14 +257,10 @@ def parameter_range_alert():
     return render_template('parameter_range_alert.html', paras=paras)
 
 
-@main.route('/intelligent_check')
-def intelligent_check():
-    return render_template('intelligent_check.html')
 
 
-@main.route('/intelligent_rule_setup')
-def intelligent_rule_setup():
-    return render_template('intelligent_rule_setup.html')
+
+
 
 #
 #

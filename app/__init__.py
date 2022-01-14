@@ -5,7 +5,7 @@ __title__ = ''
 __author__ = 'changxin'
 __mtime__ = '2018/5/15'
 """
-from flask import Flask, session, current_app
+from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 
@@ -27,6 +27,9 @@ def create_app(config_name):
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    from .ai import ai as ai_blueprint
+    app.register_blueprint(ai_blueprint, url_prefix='/ai')
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')

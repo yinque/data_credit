@@ -17,6 +17,7 @@ class Config:
     FLASKY_DB_QUERY_TIMEOUT = 0.5
 
     UPLOAD_PATH = os.path.join(basedir, "upload")
+    UPLOAD_ALGORITHM_PATH = os.path.join(basedir, "upload_algorithm")
 
     @staticmethod
     def init_app(app):

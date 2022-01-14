@@ -16,37 +16,32 @@
                                 <table>
                                     <tr>
                                         <td>算法名</td>
-                                        <td><input type="text"></td>
+                                        <td><input type="text" id="name" value=""></td>
                                     </tr>
                                     <tr>
                                         <td>算法描述</td>
-                                        <td><textarea rows="6" cols="30">填写算法描述</textarea></td>
+                                        <td><textarea id="desc" rows="6" cols="30">填写算法描述</textarea></td>
                                     </tr>
                                     <tr>
                                         <td>先训练再识别还是直接识别</td>
-                                        <td><input type="radio">训练后识别<input type="radio">直接识别</td>
+                                        <td><select id="train_first">
+                                        <option selected value="1">训练后再进行预测</option>
+                                        <option value="2">直接预测</option>
+                                        </select></td>
                                     </tr>
                                     <tr>
-                                        <td>算法文件</td>
-                                        <td><input type="file" name="file">
+                                        <td>参数名:<input id="para1_name" type="text" value=""></td>
+                                        <td>参数值:<input id="para1_value" type="text" value=""></td>
                                     </tr>
-                                    <tr>
-                                        <td>参数名:<input type="text"></td>
-                                        <td>参数值:<input type="text"></td>
+                                 <tr>
+                                        <td>参数名:<input id="para2_name" type="text" value=""></td>
+                                        <td>参数值:<input id="para2_value" type="text" value=""></td>
                                     </tr>
+<!--                                    <tr>-->
+<!--                                        <td><input type="button" value="增加参数"></td>-->
+<!--                                    </tr>-->
                                     <tr>
-                                        <td>参数名:<input type="text"></td>
-                                        <td>参数值:<input type="text"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>参数名:<input type="text"></td>
-                                        <td>参数值:<input type="text"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="button" value="增加参数"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="submit" value="提交"></td>
+                                        <td><a class="screen-btn" id="alert" href="javascript:;">确定</a></td>
                                     </tr>
                                 </table>
                             </form>
@@ -64,30 +59,16 @@
                                     <td>算法参数</td>
                                     <td>参数修改</td>
                                 </tr>
+                                {%for x in als %}
                                 <tr>
-                                    <td>oneClassSVM</td>
-                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
+                                    <td>{{x.name}}</td>
+                                    <td>{{x.parameter}}</td>
                                     <td><a href="#">
                                         <i class="am-icon-pencil"></i>修改
                                     </a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>LOF</td>
-                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
-                                    <td><a href="#">
-                                        <i class="am-icon-pencil"></i>修改
-                                    </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>isolation forest</td>
-                                    <td>参数1:123;参数2:123;参数3:2345;参数4:3455345</td>
-                                    <td><a href="#">
-                                        <i class="am-icon-pencil"></i>修改
-                                    </a>
-                                    </td>
-                                </tr>
+                                {% endfor %}
                             </table>
                         </div>
                     </div>
@@ -99,4 +80,36 @@
 
 {% block script %}
     {{ super() }}
+<script type="text/javascript">
+        $("#alert").click(function () {
+            var _data=Object();
+            _data['name']=$("#name").val();
+            _data['desc']=$("#desc").val();
+            para = "";
+            para=para+$("#para1_name").val()+":"+$("#para1_value").val()+";"+$("#para2_name").val()+":"+$("#para2_value").val()+";";
+            _data['parameter']=para
+            if($("#train_first").val()==1){
+            _data['train_first']=true
+            }else{
+            _data['train_first']=false
+            }
+            console.log(_data)
+            $.ajax({
+                url: '{{ url_for('ai.set_algorithm') }}',
+                type: 'POST',
+                data: JSON.stringify(_data),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    window.location.href = data['url'];
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+
+
+        });
+    </script>
+
 {% endblock %}

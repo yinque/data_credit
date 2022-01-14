@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     {% block head %}
-
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>通用数据可信识别系统</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="renderer" content="webkit">
         <meta http-equiv="Cache-Control" content="no-siteapp"/>
-        <!-- <link rel="icon" href="'assets/img/logo.png'"type="image/png"/> -->
         <script src="http://cdn.bootcss.com/echarts/3.3.2/echarts.min.js"></script>
         <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/amazeui.min.css") }}"/>
         <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/amazeui.datatables.min.css") }}"/>
@@ -37,16 +34,18 @@
         <!-- 右侧内容 -->
         <div class="tpl-header-fluid">
             <!-- 其它功能-->
-            <div class="am-fr tpl-header-navbar">
-                <ul>
+            <div class="am-fr">
+
                     <!-- 欢迎语 -->
-                    <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a href="#">当前查看的项目：{{current_project()['name'] if current_project() else "未设置"}}</a>
+                    <li>
+                        <div><span style="color:#FFFFFF">当前查看的项目:</span></div>
                     </li>
-                    <li class="am-text-sm tpl-header-navbar-welcome">
-                        <a></a>
+                    <li>
+                        <select id="projects">
+                            <option selected value="0">未设置</option>
+                        </select>
                     </li>
-                </ul>
+
             </div>
         </div>
 
@@ -80,7 +79,7 @@
                 </a>
             </li>
             <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.intelligent_check") }}" {% block navigate_intelligent_check %}{% endblock %}>
+                <a href="{{ url_for("ai.check") }}" {% block navigate_intelligent_check %}{% endblock %}>
                     <i class="am-icon-table sidebar-nav-link-logo"></i> 数据智能审核
                 </a>
             </li>
@@ -98,7 +97,7 @@
                     </li>
 
                     <li class="sidebar-nav-link">
-                        <a href="{{ url_for("main.intelligent_rule_setup") }}"
+                        <a href="{{ url_for("ai.set_algorithm") }}"
                                 {% block navigate_intelligent_rule_setup %}{% endblock %}>
                             <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 智能审核规则设置
                         </a>
@@ -116,6 +115,44 @@
     <script src="http://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
     <script src="{{ url_for("static",filename="assets/js/amazeui.datatables.min.js") }}"></script>
     <script src="{{ url_for("static",filename="assets/js/dataTables.responsive.min.js") }}"></script>
+    <script type="text/javascript">
+            $.ajax({
+                url: '{{ url_for('project.get') }}',
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    p=document.getElementById("projects")
+                    for(var i=0;i<data.length;i++){
+                        var _op = document.createElement('option');
+                        _op.value = data[i]['id']
+                        _op.innerText = data[i]['name']
+                        if(data[i]['selected']){
+                            _op.selected=true
+                        }
+                        p.appendChild(_op)
+                    }
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+    </script>
+<script type="text/javascript">
+$("#projects").change(function(){
+p=document.getElementById("projects")
+$.ajax({
+                url: '/set_project'+'/'+p.value,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                console.log('success')
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+});
+</script>
 {% endblock %}
 </body>
 </html>

@@ -316,5 +316,14 @@ class CheckStandard(db.Model):
         self.description = description
         self.value = value
         self.project_id = project_id
-        # db.session.add(self)
-        # db.session.commit()
+
+
+class Algorithm(db.Model):
+    """算法"""
+    __tablename__ = 'algorithm'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    parameter = db.Column(db.Text, nullable=True)
+    path = db.Column(db.Text, nullable=True)
+    train_first = db.Column(db.Boolean, nullable=True)

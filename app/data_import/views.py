@@ -147,8 +147,8 @@ def set_range(pid, start_data_id, end_data_id):
         _not_zero = data['not_zero']
         print(_zero)
         print(_not_zero)
-        zero = CheckStandard.query.filter_by(name='连续异常_零值').first()
-        not_zero = CheckStandard.query.filter_by(name='连续异常_非零').first()
+        zero = CheckStandard.query.filter_by(name='连续异常_零值').filter(CheckStandard.project_id == pid).first()
+        not_zero = CheckStandard.query.filter_by(name='连续异常_非零').filter(CheckStandard.project_id == pid).first()
         zero.value = _zero
         not_zero.value = _not_zero
         db.session.add(zero)
@@ -156,8 +156,8 @@ def set_range(pid, start_data_id, end_data_id):
         db.session.commit()
         new_url = url_for('data_import.upload_success', pid=pid, start_data_id=start_data_id, end_data_id=end_data_id)
         return jsonify(make_response_dict(200, "set successful", new_url))
-    zero = CheckStandard.query.filter_by(name='连续异常_零值').first()
-    not_zero = CheckStandard.query.filter_by(name='连续异常_非零').first()
+    zero = CheckStandard.query.filter_by(name='连续异常_零值').filter(CheckStandard.project_id == pid).first()
+    not_zero = CheckStandard.query.filter_by(name='连续异常_非零').filter(CheckStandard.project_id == pid).first()
     paras = ParameterTypes.query.filter_by(project_id=pid).all()
     return render_template('/data_import/set_range.html', paras=paras, pid=pid, zero=zero, not_zero=not_zero,
                            start_data_id=start_data_id, end_data_id=end_data_id)
@@ -169,11 +169,11 @@ def upload_success(pid, start_data_id, end_data_id):
     data_id_list = [x.id for x in datas]
     para_type_id_list = [x.id for x in ParameterTypes.query.all()]
     for x in para_type_id_list:
-        Data.continuous_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_非零').filter(
+        Data.continuous_analysis_range(x, int(CheckStandard.query.filter(CheckStandard.name == '连续异常_非零').filter(
             CheckStandard.project_id == pid).first().value),
                                        data_id_list)
     for x in para_type_id_list:
-        Data.continuous_zero_analysis_range(x, int(CheckStandard.query.filter_by(name='连续异常_零值').filter(
+        Data.continuous_zero_analysis_range(x, int(CheckStandard.query.filter(CheckStandard.name == '连续异常_非零').filter(
             CheckStandard.project_id == pid).first().value),
                                             data_id_list)
     abnormal_id = AbnormalTypes.query.filter_by(name="transcendence").first().id
