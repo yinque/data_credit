@@ -16,6 +16,11 @@ class Config:
     SQLALCHEMY_RECORD_QUERIES = True
     FLASKY_DB_QUERY_TIMEOUT = 0.5
 
+    REDIS_HOST = "127.0.0.1"  # redis数据库地址
+    REDIS_PORT = 6379  # redis 端口号
+    REDIS_DB = 0  # 数据库名
+    REDIS_EXPIRE = 60  # redis 过期时间60秒
+
     UPLOAD_PATH = os.path.join(basedir, "upload")
     UPLOAD_ALGORITHM_PATH = os.path.join(basedir, "upload_algorithm")
 

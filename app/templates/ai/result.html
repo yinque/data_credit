@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block navigate_intelligent_check %}class="active"{% endblock %}
+{% block context %}
+    <!-- 内容区域 -->
+<div class="tpl-content-wrapper" xmlns="http://www.w3.org/1999/html">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="widget am-cf">
+                        <div class="widget-head am-cf">
+                            <div class="widget-title am-fl">审核结果</div>
+                        </div>
+                        <div class="widget-body am-fr">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>使用的算法</td>
+                                    <td>{{data['algorithm']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>检测项目</td>
+                                    <td>{{data['project']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>检测的属性</td>
+                                    <td>{%for x in data['parameter_types']%}"{{x}},"{% endfor %}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% for x in data['parameter_types'] %}
+                     <div class="widget am-cf">
+                        <div class="widget-body am-fr">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>属性名</td>
+                                    <td>{{x}}</td>
+                                </tr>
+                                <tr>
+                                    <td>检测数据量</td>
+                                    <td>{{data[x]['num']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>异常数据量</td>
+                                    <td>{{data[x]['abnormal_num']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>异常比例</td>
+                                    <td>{{data[x]['proportion']}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+{% endblock %}

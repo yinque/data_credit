@@ -75,50 +75,6 @@
                             </table>
                         </div>
                     </div>
-
-
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">审核结果</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <table>
-                                <tbody>
-                                <tr>
-                                    <td>检测的数据总数</td>
-                                    <td>11456
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>异常数量</td>
-                                    <td>345</td>
-                                </tr>
-                                <tr>
-                                    <td>异常比例</td>
-                                    <td>0.03%</td>
-                                </tr>
-                                <tr>
-                                    <td>检测的数据元素</td>
-                                    <td>
-                                        高锰酸盐指数;氨氮;总磷
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>检测结果</td>
-                                    <td>[ 1., 1., 1., 1., 1., 1., 1., 1., 1., -1., -1., 1., 1.,<br>
-                                        1., 1., 1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1.,<br>
-                                        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
-                                        1., 1., 1., 1., -1., 1., -1., -1., 1., 1., 1., 1., 1.,<br>
-                                        1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1., -1., 1.,<br>
-                                        1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1.,<br>
-                                        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
-                                        1., 1., 1., 1., 1.]<br>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -215,7 +171,7 @@
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
-                    console.log(data)
+                    window.location.href = data;
                 },
                 error: function (xhr) {
                     console.error('error');

@@ -11,6 +11,10 @@ from app import db
 from ..models import Algorithm, Parameter, Project, AbnormalTypes, ParameterTypes, Abnormal
 import os
 import uuid
+from util.redis import Redis
+import json
+import datetime
+import random
 
 re_float = r'-?\d+\.?\d*e?-?\d*?'
 
@@ -26,6 +30,12 @@ def clean_para_str(s):
             y = x.split(":")
             new_s = "%s%s:%s;" % (new_s, y[0], y[1])
     return new_s
+
+
+def identifier_maker():
+    s = '{0:%Y%m%d%H%M%S%f}'.format(datetime.datetime.now()) + ''.join(
+        [str(random.randint(1, 10)) for i in range(3)])
+    return s[8:]
 
 
 @ai.route('/set', methods=["POST", "GET"])
@@ -112,6 +122,9 @@ def check():
         para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()
         data = {'parameter_types': [x.name for x in para_types]}
         algorithm = Algorithm.query.get(_data['algorithm_id'])
+        data['algorithm'] = algorithm.name
+        project = Project.query.get(_data['project_id'])
+        data['project'] = project.name
         abnormal_type = AbnormalTypes.query.filter_by(name=algorithm.name).first()
         abnormal_type_id = abnormal_type.id
         abnormal_para = []
@@ -126,7 +139,7 @@ def check():
             _d['proportion'] = _d['abnormal_num'] / _d['num']
             _d['0_1'] = []
             for p_id in paras_id:
-                _d['0_1'].append(-1 if p_id in _r else 1)
+                _d['0_-1'].append(-1 if p_id in _r else 1)
             data[x.name] = _d
         abnormal_paras = Parameter.query.filter(Parameter.id.in_(abnormal_para)).all()
         abnormals = []
@@ -142,7 +155,36 @@ def check():
         db.session.add_all(abnormal_paras)
         db.session.add_all(abnormals)
         db.session.commit()
-        return jsonify(data)
+        identifier = identifier_maker()
+        Redis.hset('check_result', identifier, json.dumps(data))
+        new_url = url_for('ai.check_result', identifier=identifier)
+        return jsonify(new_url)
     algorithms = [x.show_dict for x in Algorithm.query.all()]
     projects = Project.query.all()
     return render_template('/ai/check.html', algorithms=algorithms, projects=projects)
+
+
+@ai.route('/check_result/<string:identifier>')
+def check_result(identifier):
+    _data = Redis.hget('check_result', identifier)
+    data = json.loads(_data)
+    return render_template('/ai/result.html', data=data)
+
+
+@ai.route('/testRedisWrite', methods=['GET'])
+def test_redis_write():
+    """
+    测试redis
+    """
+    Redis.write("test_key", "test_value", 60)
+    return "ok"
+
+
+@ai.route('/testRedisRead', methods=['GET'])
+def test_redis_read():
+    """
+    测试redis
+    """
+    _data = Redis.hget('test_key', '1')
+    data = json.loads(_data)
+    return jsonify(data)
