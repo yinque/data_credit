@@ -8,7 +8,7 @@ __mtime__ = '2018/5/15'
 from . import ai
 from flask import render_template, request, jsonify, current_app, redirect, url_for
 from app import db
-from ..models import Algorithm, Parameter, Project, AbnormalTypes, ParameterTypes
+from ..models import Algorithm, Parameter, Project, AbnormalTypes, ParameterTypes, Abnormal
 import os
 import uuid
 
@@ -37,9 +37,8 @@ def set_algorithm():
         a.description = data['desc']
         a.parameter = clean_para_str(data['parameter'])
         a.train_first = data['train_first']
-
         t = AbnormalTypes.query.filter_by(name=data['name']).first()
-        assert t is not None
+        assert (t is None)
         if not t:
             t = AbnormalTypes()
             t.name = data['name']
@@ -112,18 +111,37 @@ def check():
         para_type_ids = [int(x) for x in _data['check_parameters']]
         para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()
         data = {'parameter_types': [x.name for x in para_types]}
+        algorithm = Algorithm.query.get(_data['algorithm_id'])
+        abnormal_type = AbnormalTypes.query.filter_by(name=algorithm.name).first()
+        abnormal_type_id = abnormal_type.id
+        abnormal_para = []
         for x in para_types:
             _d = {}
             paras = x.parameters
             paras_id = [x.id for x in paras]
             _d['num'] = len(paras)
             _r = check_use_algorithm(_data['algorithm_id'], paras)
+            abnormal_para = abnormal_para + _r
             _d['abnormal_num'] = len(_r)
             _d['proportion'] = _d['abnormal_num'] / _d['num']
             _d['0_1'] = []
             for p_id in paras_id:
                 _d['0_1'].append(-1 if p_id in _r else 1)
             data[x.name] = _d
+        abnormal_paras = Parameter.query.filter(Parameter.id.in_(abnormal_para)).all()
+        abnormals = []
+        for x in abnormal_paras:
+            x.is_abnormal = True
+            x.data.is_abnormal = True
+            _a = Abnormal()
+            _a.data_id = x.data.id
+            _a.abnormal_type_id = abnormal_type_id
+            _a.parameter_id = x.id
+            _a.parameter_type_id = x.parameter_type_id
+            abnormals.append(_a)
+        db.session.add_all(abnormal_paras)
+        db.session.add_all(abnormals)
+        db.session.commit()
         return jsonify(data)
     algorithms = [x.show_dict for x in Algorithm.query.all()]
     projects = Project.query.all()
