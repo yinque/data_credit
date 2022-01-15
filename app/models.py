@@ -327,3 +327,22 @@ class Algorithm(db.Model):
     parameter = db.Column(db.Text, nullable=True)
     path = db.Column(db.Text, nullable=True)
     train_first = db.Column(db.Boolean, nullable=True)
+
+    @property
+    def paramemter_list(self):
+        paras = []
+        for x in self.parameter.split(";"):
+            if len(x) > 2:
+                y = x.split(":")
+                paras.append((y[0], y[1]))
+        return paras
+
+    @property
+    def show_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'parameter': self.parameter,
+            'need_train': self.train_first
+        }

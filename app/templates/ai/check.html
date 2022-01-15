@@ -17,57 +17,56 @@
                                 <tr>
                                     <td>选择算法</td>
                                     <td>
-                                        <select id="para_type">
-                                            <option value="1">oneClassSVM</option>
-                                            <option value="2">isolation forest</option>
-                                            <option value="3">LOF</option>
+                                        <select id="algorithm">
+                                            {% for x in algorithms%}
+                                            <option value="{{x.id}}">{{x['name']}}</option>
+                                            {% endfor %}
                                         </select>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>参数1</td>
-                                    <td>123</td>
+                                </tbody>
+                                <tbody id="algorithms_desc">
+                                {% for x in algorithms %}
+                                <tr id="algorithms_description_{{x['id']}}">
+                                    <td>描述</td>
+                                    <td>{{x['description']}}</td>
                                 </tr>
-                                <tr>
-                                    <td>参数2</td>
-                                    <td>5563</td>
+                                {% endfor %}
+                                 </tbody>
+
+                                <tbody id="algorithms_paras">
+                                {% for x in algorithms %}
+                                <tr id="algorithms_paras_{{x['id']}}">
+                                    <td>算法参数</td>
+                                    <td>{{x['parameter']}}</td>
                                 </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tbody>
                                 <tr>
-                                    <td>参数3</td>
-                                    <td>56643</td>
-                                </tr>
-                                <tr>
-                                    <td>数据起止ID(最大11456: 最小:1)</td>
-                                    <td>起始ID:<input type="text" id="id_start" value="1" name="auto_checked">
-                                        终止ID:<input type="text" id="id_end" value="11456" name="auto_checked">
+                                    <td>要检测的项目</td>
+                                    <td>
+                                        <select id="project">
+                                            {% for x in projects%}
+                                            <option value="{{x.id}}">{{x['name']}}</option>
+                                            {% endfor %}
+                                        </select>
                                     </td>
                                 </tr>
-                                <tr>
+                                </tbody>
+                                <tbody id="project_paras">
+                                {% for x in projects%}
+                                <tr id="projects_paras_{{x['id']}}">
                                     <td>选择要检测的数据元素</td>
-                                    <td><input type="checkbox" name="parameters" value="1" checked>水温
-
-                                        <input type="checkbox" name="parameters" value="2" checked>pH
-
-                                        <input type="checkbox" name="parameters" value="3" checked>溶解氧
-
-                                        <input type="checkbox" name="parameters" value="4" checked>电导率
-
-                                        <input type="checkbox" name="parameters" value="5" checked>浊度
-
-                                        <input type="checkbox" name="parameters" value="6" checked>高锰酸盐指数
-
-                                        <input type="checkbox" name="parameters" value="7" checked>氨氮
-
-                                        <input type="checkbox" name="parameters" value="8" checked>总磷
-
-                                        <input type="checkbox" name="parameters" value="9" checked>总氮
-
-                                        <input type="checkbox" name="parameters" value="10" checked>叶绿素α
-
-                                        <input type="checkbox" name="parameters" value="11" checked>藻密度
+                                    <td>
+                                    {% for y in x.parameter_types %}
+                                    <input type="checkbox" name="parameters_{{x['id']}}" value="{{y.id}}" checked>{{y.name}}
+                                    {% endfor %}
                                     </td>
-
                                 </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tbody>
                                 <tr>
                                     <td><a href="#">
                                         <a class="screen-btn" id="start" href="javascript:;">开始</a> </a></td>
@@ -128,4 +127,100 @@
 
 {% block script %}
     {{ super() }}
+<script type="text/javascript">
+    select_algorithm = document.getElementById("algorithm")
+    desc = document.getElementById("algorithms_desc")
+    for(var i=0;i<desc.children.length;i++){
+    id_split = desc.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_algorithm.value){
+        desc.children[i].style.display="table-row";
+    }else{
+        desc.children[i].style.display="none";
+    }}
+    paras = document.getElementById("algorithms_paras")
+    for(var i=0;i<paras.children.length;i++){
+    id_split = paras.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_algorithm.value){
+        paras.children[i].style.display="table-row";
+    }else{
+        paras.children[i].style.display="none";
+    }}
+    select_project = document.getElementById("project")
+    project_paras = document.getElementById("project_paras")
+    for(var i=0;i<project_paras.children.length;i++){
+    id_split = project_paras.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_project.value){
+        project_paras.children[i].style.display="table-row";
+    }else{
+        project_paras.children[i].style.display="none";
+    }}
+</script>
+<script type="text/javascript">
+    $("#algorithm").change(function(){
+    select_algorithm = document.getElementById("algorithm")
+    desc = document.getElementById("algorithms_desc")
+    for(var i=0;i<desc.children.length;i++){
+    id_split = desc.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_algorithm.value){
+        desc.children[i].style.display="table-row";
+    }else{
+        desc.children[i].style.display="none";
+    }}
+    paras = document.getElementById("algorithms_paras")
+    for(var i=0;i<paras.children.length;i++){
+    id_split = paras.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_algorithm.value){
+        paras.children[i].style.display="table-row";
+    }else{
+        paras.children[i].style.display="none";
+    }}
+});
+</script>
+<script type="text/javascript">
+    $("#project").change(function(){
+    select_project = document.getElementById("project")
+    project_paras = document.getElementById("project_paras")
+    for(var i=0;i<project_paras.children.length;i++){
+    id_split = project_paras.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_project.value){
+        project_paras.children[i].style.display="table-row";
+    }else{
+        project_paras.children[i].style.display="none";
+    }}
+});
+</script>
+<script type="text/javascript">
+            $("#start").click(function () {
+            var _data=Object();
+            select_algorithm = document.getElementById("algorithm")
+            select_project = document.getElementById("project")
+            _data['algorithm_id'] = select_algorithm.value
+            _data['project_id'] = select_project.value
+            _data['check_parameters'] = []
+            project_paras = document.getElementById("project_paras")
+            for(var i=0;i<project_paras.children.length;i++){
+    id_split = project_paras.children[i].id.split("_")
+    if(id_split[id_split.length-1]==select_project.value){
+        checkbox = project_paras.children[i].children[1]
+        for(var l=0;l<checkbox.children.length;l++){
+            if(checkbox.children[l].checked){
+            _data['check_parameters'].push(checkbox.children[l].value)
+            }
+        }
+    }}
+            $.ajax({
+                url: '{{ url_for('ai.check') }}',
+                type: 'POST',
+                data: JSON.stringify(_data),
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (xhr) {
+                    console.error('error');
+                }
+            });
+        });
+</script>
 {% endblock %}
