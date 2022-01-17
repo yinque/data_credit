@@ -12,7 +12,6 @@ from app import db
 import pandas as pd
 from datetime import datetime
 import re
-import time
 import os
 import uuid
 

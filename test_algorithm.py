@@ -27,9 +27,6 @@ class Parameter:
 class Algorithm:
     k = 0
 
-    def fit(self):
-        print("fitted")
-
-    def predict(self, parameter_list):
+    def fit_predict(self, parameter_list):
         self.k = int(self.k)
         return [x.id for x in random.choices(population=parameter_list, k=self.k)]

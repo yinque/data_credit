@@ -15,6 +15,7 @@ from util.redis import Redis
 import json
 import datetime
 import random
+from sklearn.cluster import k_means
 
 re_float = r'-?\d+\.?\d*e?-?\d*?'
 
@@ -110,7 +111,23 @@ def check_use_algorithm(algorithm_id, para_list):
         a.fit(para_list)
         result = a.predict(para_list)
     else:
-        result = a.predict(para_list)
+        result = a.fit_predict(para_list)
+    return result
+
+
+def check_project_use_algorithm(algorithm_id, check_array):
+    al = Algorithm.query.get_or_404(algorithm_id)
+    file_name = al.path.split("/")[-1].split(".")[0]
+    s = "upload_algorithm." + file_name
+    p = __import__(s, fromlist=["Algorithm", ])
+    a = p.Algorithm()
+    set_para(a, al.parameter)
+    set_para(a, al.parameter)
+    if al.train_first:
+        a.fit(check_array)
+        result = a.predict(check_array)
+    else:
+        result = a.fit_predict(check_array)
     return result
 
 
@@ -119,7 +136,7 @@ def check():
     if request.method == "POST":
         _data = request.get_json()
         para_type_ids = [int(x) for x in _data['check_parameters']]
-        para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()
+        para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()  # TODO 不用
         data = {'parameter_types': [x.name for x in para_types]}
         algorithm = Algorithm.query.get(_data['algorithm_id'])
         data['algorithm'] = algorithm.name
@@ -137,9 +154,9 @@ def check():
             abnormal_para = abnormal_para + _r
             _d['abnormal_num'] = len(_r)
             _d['proportion'] = _d['abnormal_num'] / _d['num']
-            _d['0_1'] = []
+            _d['-1_1'] = []
             for p_id in paras_id:
-                _d['0_-1'].append(-1 if p_id in _r else 1)
+                _d['-1_1'].append(-1 if p_id in _r else 1)
             data[x.name] = _d
         abnormal_paras = Parameter.query.filter(Parameter.id.in_(abnormal_para)).all()
         abnormals = []
@@ -185,6 +202,6 @@ def test_redis_read():
     """
     测试redis
     """
-    _data = Redis.hget('test_key', '1')
+    _data = Redis.hget('check_result', '1635228151547610')
     data = json.loads(_data)
     return jsonify(data)

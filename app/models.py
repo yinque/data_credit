@@ -9,6 +9,7 @@ from app import db
 from .algorithm.continuous import continuous_analysis, continuous_zeros_analysis
 from flask import url_for
 from time import time
+import numpy as np
 
 FORMAT_DATA = '%Y-%m-%d'
 FORMAT_DATA_TIME = '%Y-%m-%d %H:%M:%S'
@@ -23,6 +24,15 @@ class Project(db.Model):
     datas = db.relationship('Data', backref='project')
     parameter_types = db.relationship('ParameterTypes', backref='project')
     check_standards = db.relationship('CheckStandard', backref='project')
+
+    def check_array(self, para_type_id_list):
+        _array = []
+        for x in self.datas:
+            _d = x.parameters
+            _d = [p for p in _d if p.parameter_type_id in para_type_id_list]
+            _d.sort(key=lambda p: p.parameter_type_id)
+            _array.append([y.value for y in _d])
+        return np.array(_array)
 
 
 class Data(db.Model):
