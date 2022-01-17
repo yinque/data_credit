@@ -7,7 +7,7 @@ __mtime__ = '2022/1/13'
 """
 from functools import wraps
 from flask import current_app
-from flask import redirect, url_for,abort
+from flask import redirect, url_for, abort
 
 
 def current_project_check():

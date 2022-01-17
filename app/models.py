@@ -5,6 +5,8 @@ __title__ = ''
 __author__ = 'changxin'
 __mtime__ = '2018/5/15'
 """
+import random
+
 from app import db
 from .algorithm.continuous import continuous_analysis, continuous_zeros_analysis
 from flask import url_for
@@ -33,6 +35,13 @@ class Project(db.Model):
             _d.sort(key=lambda p: p.parameter_type_id)
             _array.append([y.value for y in _d])
         return np.array(_array)
+
+    def get_abnormal_datas(self, array):
+        datas = zip(self.datas, array)
+        return [x[0] for x in datas if x[1] == -1]
+
+    def get_test_result_array(self):
+        return np.array([random.choice([-1, 1]) for x in range(len(self.datas))])
 
 
 class Data(db.Model):

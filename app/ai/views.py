@@ -76,11 +76,27 @@ def upload(al_id):
     return render_template('/ai/upload.html', pid=al_id)
 
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+    #
+    # try:
+    #     import unicodedata
+    #     unicodedata.numeric(s)
+    #     return True
+    # except (TypeError, ValueError):
+    #     pass
+    return False
+
+
 def set_para(al, s):
     for x in s.split(";"):
         if len(x) > 2:
             y = x.split(':')
-            setattr(al, y[0], float(y[1]))
+            setattr(al, y[0], float(y[1]) if is_number(y[1]) else y[1])
 
 
 @ai.route('/test/<int:al_id>')
@@ -136,41 +152,35 @@ def check():
     if request.method == "POST":
         _data = request.get_json()
         para_type_ids = [int(x) for x in _data['check_parameters']]
-        para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()  # TODO 不用
-        data = {'parameter_types': [x.name for x in para_types]}
+        para_types = ParameterTypes.query.filter(ParameterTypes.id.in_(para_type_ids)).all()
         algorithm = Algorithm.query.get(_data['algorithm_id'])
-        data['algorithm'] = algorithm.name
         project = Project.query.get(_data['project_id'])
-        data['project'] = project.name
         abnormal_type = AbnormalTypes.query.filter_by(name=algorithm.name).first()
-        abnormal_type_id = abnormal_type.id
-        abnormal_para = []
-        for x in para_types:
-            _d = {}
-            paras = x.parameters
-            paras_id = [x.id for x in paras]
-            _d['num'] = len(paras)
-            _r = check_use_algorithm(_data['algorithm_id'], paras)
-            abnormal_para = abnormal_para + _r
-            _d['abnormal_num'] = len(_r)
-            _d['proportion'] = _d['abnormal_num'] / _d['num']
-            _d['-1_1'] = []
-            for p_id in paras_id:
-                _d['-1_1'].append(-1 if p_id in _r else 1)
-            data[x.name] = _d
-        abnormal_paras = Parameter.query.filter(Parameter.id.in_(abnormal_para)).all()
-        abnormals = []
-        for x in abnormal_paras:
+        result = check_project_use_algorithm(algorithm.id, project.check_array(para_type_ids))
+        data = {'parameter_types': [x.name for x in para_types],
+                'algorithm': algorithm.name,
+                'project': project.name,
+                'num': len(result),
+                'abnormal_num': len([x for x in result if x == -1]),
+                'proportion': len([x for x in result if x == -1]) / len(result),
+                '-1_1': [int(x) for x in list(result)]
+                }
+        abnormal_datas = project.get_abnormal_datas(result)
+        print(abnormal_datas)
+        abnormal_list = []
+        for x in abnormal_datas:
             x.is_abnormal = True
-            x.data.is_abnormal = True
-            _a = Abnormal()
-            _a.data_id = x.data.id
-            _a.abnormal_type_id = abnormal_type_id
-            _a.parameter_id = x.id
-            _a.parameter_type_id = x.parameter_type_id
-            abnormals.append(_a)
-        db.session.add_all(abnormal_paras)
-        db.session.add_all(abnormals)
+            for p in x.parameters:
+                if p.parameter_type_id in para_type_ids:
+                    p.is_abnormal = True
+                    _a = Abnormal()
+                    _a.data_id = x.id
+                    _a.abnormal_type_id = abnormal_type.id
+                    _a.parameter_type_id = p.parameter_type_id
+                    _a.parameter_id = p.id
+                    abnormal_list.append(_a)
+        db.session.add_all(abnormal_datas)
+        db.session.add_all(abnormal_list)
         db.session.commit()
         identifier = identifier_maker()
         Redis.hset('check_result', identifier, json.dumps(data))
