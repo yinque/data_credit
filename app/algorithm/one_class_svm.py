@@ -3,15 +3,6 @@ import pandas as pd
 from sklearn.svm import OneClassSVM
 
 
-# usage:  （contamination为异常比例）
-# clf = Demo1(contamination=outliers_fraction)
-# y_pred = clf.fit_predict(X)
-
-# 其中：X为array形式的输入数据，维数任意
-#      y_pred为一维数组形式的识别结果，形如：array([ 1,  1,  -1,  ... ,-1])，
-#             -1表示相应行为异常值，1表示 相应行为正常值 
-
-
 class Algorithm:
     clf = None  # 保存算法实例
     data = None  # 原始数据，包含空数据，用于去空
