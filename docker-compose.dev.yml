@@ -21,6 +21,12 @@ services:
   - mysql:/var/lib/mysql
   - mysql_config:/etc/mysql
 
+ redisdb:
+  image: redis
+  ports:
+  - 6379:6379
+
+
 volumes:
   mysql:
   mysql_config:

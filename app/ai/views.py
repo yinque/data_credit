@@ -138,7 +138,7 @@ def check_project_use_algorithm(algorithm_id, check_array):
     p = __import__(s, fromlist=["Algorithm", ])
     a = p.Algorithm()
     set_para(a, al.parameter)
-    set_para(a, al.parameter)
+    # set_para(a, al.parameter)
     if al.train_first:
         a.fit(check_array)
         result = a.predict(check_array)
