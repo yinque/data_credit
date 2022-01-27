@@ -133,7 +133,7 @@ def check_use_algorithm(algorithm_id, para_list):
 
 def check_project_use_algorithm(algorithm_id, check_array):
     al = Algorithm.query.get_or_404(algorithm_id)
-    file_name = al.path.split("/")[-1].split(".")[0]
+    file_name = al.path.split("/")[-1].split(".")[0].split("\\")[-1].split(".")[0]
     s = "upload_algorithm." + file_name
     p = __import__(s, fromlist=["Algorithm", ])
     a = p.Algorithm()
