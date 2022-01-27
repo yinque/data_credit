@@ -1,184 +1,396 @@
-$(function() {
-    // 读取body data-type 判断是哪个页面然后执行相应页面方法，方法在下面。
-    var dataType = $('body').attr('data-type');
-    for (key in pageData) {
-        if (key == dataType) {
-            pageData[key]();
+'use strict';
+
+(function ($) {
+
+    var wind_ = $(window),
+        body_ = $('body');
+
+    feather.replace();
+
+    /*------------- create overlay -------------*/
+    $.createOverlay = function () {
+        if ($('.overlay').length < 1) {
+            body_.addClass('no-scroll').append('<div class="overlay"></div>');
+            $('.overlay').addClass('show');
         }
+    };
+    /*------------- create overlay -------------*/
+
+    if (body_.hasClass('layout-container')) {
+        // body_.addClass('hidden-side-menu');
+        $('.container-fluid').addClass('container').removeClass('container-fluid');
     }
-    //     // 判断用户是否已有自己选择的模板风格
-    //    if(storageLoad('SelcetColor')){
-    //      $('body').attr('class',storageLoad('SelcetColor').Color)
-    //    }else{
-    //        storageSave(saveSelectColor);
-    //        $('body').attr('class','theme-black')
-    //    }
 
-    autoLeftNav();
-    $(window).resize(function() {
-        autoLeftNav();
-        console.log($(window).width())
-    });
+    /*------------- page loader -------------*/
+    wind_.on('load', function () {
 
-    //    if(storageLoad('SelcetColor')){
+        if ($('body').hasClass('layout-container')) {
+            $('.side-menu .side-menu-body').wrap('<div class="container"></div>');
+        } else {
+            $('.side-menu .side-menu-body').wrap('<div class="container-fluid"></div>');
+        }
 
-    //     }else{
-    //       storageSave(saveSelectColor);
-    //     }
-})
+        $('.page-loader').fadeOut(300, function () {
 
+            setTimeout(function () {
+                toastr.options = {
+                    timeOut: 1000,
+                    progressBar: true,
+                    showMethod: "slideDown",
+                    hideMethod: "slideUp",
+                    showDuration: 100,
+                    hideDuration: 100
+                };
 
-// 页面数据
-var pageData = {
-    // ===============================================
-    // 首页
-    // ===============================================
-    'index': function indexData() {
-        $('#example-r').DataTable({
+                // toastr.success('欢迎来到通用数据可识别系统!');
+            }, 1000);
 
-            bInfo: false, //页脚信息
-            dom: 'ti'
         });
 
+    });
+    /*------------- page loader -------------*/
 
-        // ==========================
-        // 百度图表A http://echarts.baidu.com/
-        // ==========================
-
-        var echartsA = echarts.init(document.getElementById('tpl-echarts'));
-        option = {
-            tooltip: {
-                trigger: 'axis'
-            },
-            grid: {
-                top: '3%',
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [{
-                type: 'category',
-                boundaryGap: false,
-                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-            }],
-            yAxis: [{
-                type: 'value'
-            }],
-            textStyle: {
-                color: '#838FA1'
-            },
-            series: [{
-                name: '邮件营销',
-                type: 'line',
-                stack: '总量',
-                areaStyle: { normal: {} },
-                data: [120, 132, 101, 134, 90],
-                itemStyle: {
-                    normal: {
-                        color: '#1cabdb',
-                        borderColor: '#1cabdb',
-                        borderWidth: '2',
-                        borderType: 'solid',
-                        opacity: '1'
-                    },
-                    emphasis: {
+    /*------------- side menu (sub menü arrow) -------------*/
+    wind_.on('load', function () {
+        setTimeout(function () {
+            $('.side-menu .side-menu-body ul li a').each(function () {
+                var $this = $(this);
+                if ($this.next('ul').length) {
+                    $this.append('<i class="sub-menu-arrow ti-angle-right"></i>');
+                    if (body_.hasClass('horizontal-side-menu')) {
+                        $('.side-menu .side-menu-body > ul > li > a > .sub-menu-arrow').removeClass('ti-angle-right').addClass('ti-angle-down');
 
                     }
                 }
-            }]
-        };
+            });
+        }, 200);
+    });
+    /*------------- side menu (sub menü arrow) -------------*/
 
-        echartsA.setOption(option);
-    },
-    // ===============================================
-    // 图表页
-    // ===============================================
-    'chart': function chartData() {
-        // ==========================
-        // 百度图表A http://echarts.baidu.com/
-        // ==========================
-      if (document.getElementById('tpl-echarts-C')) {
-    //     var echartsC = echarts.init(document.getElementById('tpl-echarts-C'));
-    //     optionC = {
-    //       tooltip: {
-    //           },
-    //         legend: {
-    //               data: ['人数']
-    //               },
-    //         xAxis: {
-    //             data: ['注册人数', '访客数(天)', '访客数(周)']
-    //         },
-    //         yAxis: {
-    //             type: 'value'
-    //         },
-    //         itemStyle: {
-    //             normal: {
-    //                 color: '#4169E1',
-    //             }
-    //         },
-    //         series: [{
-    //             data: [120, 500, 150],
-    //             type: 'bar'
-    //         }]
-    //     };
-    //     echartsC.setOption(optionC);
-    // }
-    console.log(123);
-    }
-}
+    /*------------- sidebar show/hide -------------*/
+    $(document).on('click', '.sidebar-open', function () {
+        var sidebar_target = $(this).data('sidebar-target'),
+            $sidebar = $('.sidebar');
+        $sidebar.find('ul.nav li a[href="' + sidebar_target + '"]').trigger('click');
+        if (!$sidebar.hasClass('show')) {
+            $sidebar.addClass('show');
+            $.createOverlay();
+        }
+        return false;
+    });
 
+    $(document).on('click', '*', function (e) {
+        if (
+            (!$(e.target).is('.sidebar, .sidebar *, .sidebar-open, .sidebar-open *') && $('.sidebar').hasClass('show')) ||
+            (!$(e.target).is('.search-panel-open, .search-panel-open *, nav.navbar .header-body form.search, nav.navbar .header-body form.search *') && $('nav.navbar .header-body form.search').hasClass('show')) ||
+            (!$(e.target).is('.side-menu-open, .side-menu-open *, .side-menu, .side-menu *') && $('.side-menu').hasClass('show'))
+        ) {
+            $('.sidebar').removeClass('show');
+            $('nav.navbar .header-body form.search').removeClass('show');
+            $('.side-menu').removeClass('show');
+            body_.removeClass('no-scroll');
+            $('.overlay').remove();
+        }
+    });
+    /*------------- sidebar show/hide -------------*/
 
-// 风格切换
+    /*------------- mobile search panel open -------------*/
+    $(document).on('click', '.search-panel-open', function () {
+        $('nav.navbar form.search')
+            .addClass('show')
+            .find('input:first')
+            .focus();
+        $.createOverlay();
+        return false;
+    });
+    /*------------- mobile search panel open -------------*/
 
-// $('.tpl-skiner-toggle').on('click', function() {
-//     $('.tpl-skiner').toggleClass('active');
-// })
-//
-// $('.tpl-skiner-content-bar').find('span').on('click', function() {
-//     $('body').attr('class', $(this).attr('data-color'))
-//     saveSelectColor.Color = $(this).attr('data-color');
-//     // 保存选择项
-//     storageSave(saveSelectColor);
-//
-// })
+    /*------------- mobile or hidden side menu open -------------*/
+    $(document).on('click', '.side-menu-open', function () {
+        $('.side-menu').addClass('show');
+        $.createOverlay();
+        return false;
+    });
+    /*------------- mobile or hidden side menu open -------------*/
 
+    /*------------- form validation -------------*/
+    window.addEventListener('load', function () {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+        // Loop over them and prevent submission
+        Array.prototype.filter.call(forms, function (form) {
+            form.addEventListener('submit', function (event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+    /*------------- form validation -------------*/
 
+    /*------------- responsive html table -------------*/
+    var table_responsive_stack = $(".table-responsive-stack");
+    table_responsive_stack
+        .find("th")
+        .each(function (i) {
+            $(".table-responsive-stack td:nth-child(" + (i + 1) + ")").prepend(
+                '<span class="table-responsive-stack-thead">' +
+                $(this).text() +
+                ":</span> "
+            );
+            $(".table-responsive-stack-thead").hide();
+        });
 
+    table_responsive_stack.each(function () {
+        var thCount = $(this).find("th").length,
+            rowGrow = 100 / thCount + "%";
+        $(this).find("th, td").css("flex-basis", rowGrow);
+    });
 
-// 侧边菜单开关
+    function flexTable() {
+        if (wind_.width() < 768) {
+            $(".table-responsive-stack").each(function (i) {
+                $(this)
+                    .find(".table-responsive-stack-thead")
+                    .show();
+                $(this)
+                    .find("thead")
+                    .hide();
+            });
 
-
-function autoLeftNav() {
-
-
-
-    $('.tpl-header-switch-button').on('click', function() {
-        if ($('.left-sidebar').is('.active')) {
-            if ($(window).width() > 1024) {
-                $('.tpl-content-wrapper').removeClass('active');
-            }
-            $('.left-sidebar').removeClass('active');
+            // window is less than 768px
         } else {
+            $(".table-responsive-stack").each(function (i) {
+                $(this)
+                    .find(".table-responsive-stack-thead")
+                    .hide();
+                $(this)
+                    .find("thead")
+                    .show();
+            });
+        }
+    }
 
-            $('.left-sidebar').addClass('active');
-            if ($(window).width() > 1024) {
-                $('.tpl-content-wrapper').addClass('active');
+    flexTable();
+    initCustomScrollbar();
+
+    window.onresize = function (event) {
+        flexTable();
+        initCustomScrollbar('resize');
+    };
+    /*------------- responsive html table -------------*/
+
+    /*------------- custom accordion -------------*/
+    $(document).on('click', '.accordion.custom-accordion .accordion-row a.accordion-header', function () {
+        var $this = $(this);
+        $this.closest('.accordion.custom-accordion').find('.accordion-row').not($this.parent()).removeClass('open');
+        $this.parent('.accordion-row').toggleClass('open');
+        return false;
+    });
+    /*------------- custom accordion -------------*/
+
+    /*------------- responsive table dropdown -------------*/
+    var dropdownMenu,
+        table_responsive = $('.table-responsive');
+
+    table_responsive.on('show.bs.dropdown', function (e) {
+        dropdownMenu = $(e.target).find('.dropdown-menu');
+        body_.append(dropdownMenu.detach());
+        var eOffset = $(e.target).offset();
+        dropdownMenu.css({
+            'display': 'block',
+            'top': eOffset.top + $(e.target).outerHeight(),
+            'left': eOffset.left,
+            'width': '184px',
+            'font-size': '14px'
+        });
+        dropdownMenu.addClass("mobPosDropdown");
+    });
+
+    table_responsive.on('hide.bs.dropdown', function (e) {
+        $(e.target).append(dropdownMenu.detach());
+        dropdownMenu.hide();
+    });
+    /*------------- responsive table dropdown -------------*/
+
+    /*------------- chat -------------*/
+    $(document).on('click', '.chat-app-wrapper .btn-chat-sidebar-open', function () {
+        $('.chat-app-wrapper .chat-sidebar').addClass('chat-sidebar-opened');
+        return false;
+    });
+
+    $(document).on('click', '*', function (e) {
+        if (!$(e.target).is('.chat-app-wrapper .chat-sidebar, .chat-app-wrapper .chat-sidebar *, .chat-app-wrapper .btn-chat-sidebar-open, .chat-app-wrapper .btn-chat-sidebar-open *')) {
+            $('.chat-app-wrapper .chat-sidebar').removeClass('chat-sidebar-opened');
+        }
+    });
+    /*------------- chat -------------*/
+
+    /*------------- aside menu toggle -------------*/
+    $(document).on('click', '.side-menu ul li a', function () {
+        var $this = $(this);
+        if ($this.next('ul').length) {
+            $this.find('.sub-menu-arrow').toggleClass('rotate-in');
+            $this.next('ul').toggle(200);
+            $this.parent('li').siblings().find('ul').not($this.parent('li').find('ul')).hide();
+            $this.next('ul').find('li ul').hide();
+            if (!body_.hasClass('horizontal-side-menu') && !body_.hasClass('icon-side-menu') && wind_.width() >= 768) {
+                setTimeout(function () {
+                    $('.side-menu>.side-menu-body>ul').getNiceScroll().resize();
+                }, 300);
+            }
+            return false;
+        }
+    });
+
+    $('body.icon-side-menu .side-menu').hover(function (e) {
+    }, function (e) {
+        e.stopPropagation();
+        $('.side-menu ul').removeAttr('style');
+    });
+    /*------------- aside menu toggle -------------*/
+
+    /*------------- other -------------*/
+    $(document).on('click', '.dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+
+    $('#exampleModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget),
+            recipient = button.data('whatever'),
+            modal = $(this);
+
+        modal.find('.modal-title').text('New message to ' + recipient);
+        modal.find('.modal-body input').val(recipient);
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+    $('[data-toggle="popover"]').popover();
+
+    $('.carousel').carousel();
+
+    wind_.scroll(function () {
+        $('nav.navbar .dropdown.show [data-toggle="dropdown"]').trigger('click');
+    });
+
+    if (body_.hasClass('icon-side-menu')) {
+        $('.side-menu').hover(function (e) {
+            $('.side-menu').on('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function (e) {
+                $('.side-menu>div>ul').niceScroll();
+            });
+        });
+    }
+
+    function initCustomScrollbar(type) {
+
+        type = type ? type : '';
+
+        if (type == 'resize') {
+            if (wind_.width() >= 768) {
+                $('.card-scroll').getNiceScroll().resize();
+            }
+
+            if (
+                (!body_.hasClass('horizontal-side-menu') && wind_.width() >= 992) ||
+                body_.hasClass('horizontal-side-menu') && wind_.width() < 992
+            ) {
+                if (wind_.width() >= 768) {
+                    $('.side-menu>div>ul').getNiceScroll().resize();
+                }
+            }
+
+            $('.card').each(function () {
+                if (wind_.width() >= 768) {
+                    var $this = $(this),
+                        scroll_div = $this.find('.card-scroll');
+                    if (scroll_div.length) {
+                        scroll_div.getNiceScroll().resize();
+                    }
+                }
+            });
+
+            $('.sidebar .tab-content .tab-pane').each(function () {
+                if (wind_.width() >= 768) {
+                    var $this = $(this);
+                    $this.find('.tab-pane-body').getNiceScroll().resize();
+                }
+            });
+
+            $('.dropdown-menu').each(function () {
+                if (typeof $('.dropdown-menu-body', this)[0] != 'undefined' && wind_.width() >= 768) {
+                    $('.dropdown-menu-body', this).getNiceScroll().resize();
+                }
+            });
+
+            if (wind_.width() >= 768) {
+                $('.chat-app .chat-sidebar .chat-sidebar-messages')[0] ? $('.chat-app .chat-sidebar .chat-sidebar-messages').getNiceScroll().resize() : '';
+
+                $('.chat-app .chat-body .chat-body-messages')[0] ? $('.chat-app .chat-body .chat-body-messages').getNiceScroll().resize() : '';
+            }
+
+        } else {
+            if (wind_.width() >= 768) {
+                $('.card-scroll').niceScroll();
+                $('.table-responsive').niceScroll();
+            }
+
+            if (
+                (!body_.hasClass('horizontal-side-menu') && wind_.width() >= 992) ||
+                body_.hasClass('horizontal-side-menu') && wind_.width() < 992
+            ) {
+                wind_.on('load', function () {
+                    if (!body_.hasClass('horizontal-side-menu') && !body_.hasClass('icon-side-menu') && wind_.width() >= 768) {
+                        $('.side-menu .side-menu-body>ul').niceScroll();
+                    }
+                });
+            }
+
+            $('.card').each(function () {
+                if (wind_.width() >= 768) {
+                    var $this = $(this),
+                        scroll_div = $this.find('.card-scroll');
+                    if (scroll_div.length) {
+                        scroll_div.niceScroll();
+                    }
+                }
+            });
+
+            $('.sidebar .tab-content .tab-pane').each(function () {
+                if (wind_.width() >= 768) {
+                    var $this = $(this);
+                    $this.find('.tab-pane-body').niceScroll();
+                }
+            });
+
+            $('.dropdown-menu').each(function () {
+                if (typeof $('.dropdown-menu-body', this)[0] != 'undefined' && wind_.width() >= 768) {
+                    $('.dropdown-menu-body', this).niceScroll();
+                }
+            });
+
+            if (wind_.width() >= 768) {
+                $('.chat-app .chat-sidebar .chat-sidebar-messages')[0] ? $('.chat-app .chat-sidebar .chat-sidebar-messages').scrollTop($('.chat-app .chat-sidebar .chat-sidebar-messages').get(0).scrollHeight, -1).niceScroll() : '';
+
+                $('.chat-app .chat-body .chat-body-messages')[0] ? $('.chat-app .chat-body .chat-body-messages').scrollTop($('.chat-app .chat-body .chat-body-messages').get(0).scrollHeight, -1).niceScroll() : '';
             }
         }
-    })
-
-    if ($(window).width() < 1024) {
-        $('.left-sidebar').addClass('active');
-    } else {
-        $('.left-sidebar').removeClass('active');
     }
-}
 
+    if (typeof CKEDITOR == 'object' && $('body').hasClass('dark')) {
+        var backgroundColor = $('.card').css("background-color"),
+            fontColor = $('body').css("color");
+        CKEDITOR.on('instanceReady', function (e) {
+            var iframe = $('iframe.cke_wysiwyg_frame');
+            iframe.each(function (e) {
+                var ifrm = $(this)[0];
+                var iframeDocument = ifrm.contentDocument || ifrm.contentWindow.document;
+                iframeDocument.body.style.backgroundColor = backgroundColor;
+                iframeDocument.body.style.color = fontColor;
+            });
+        });
+    }
 
-// 侧边菜单
-$('.sidebar-nav-sub-title').on('click', function() {
-    $(this).siblings('.sidebar-nav-sub').slideToggle(80)
-        .end()
-        .find('.sidebar-nav-sub-ico').toggleClass('sidebar-nav-sub-ico-rotate');
-})
+})(jQuery);
