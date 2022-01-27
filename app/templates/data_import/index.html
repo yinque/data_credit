@@ -2,42 +2,31 @@
 {% block navigate_upload %}class="active"{% endblock %}
 {% block context %}
 <!-- 内容区域 -->
-<div class="tpl-content-wrapper">
-    <div class="row-content am-cf">
-        <div class="row">
-            <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                <div class="widget am-cf">
-                    <div class="widget-head am-cf">
-                        <div class="widget-title am-fl">原始数据导入</div>
-                    </div>
-                    <div class="widget-body am-fr">
-                        <span>请选择为哪个项目上传数据</span>
-                        <table>
-
-                            <tr>
-                                <th>项目id</th>
-                                <th>项目名</th>
-                                <th>描述</th>
-                                <th>操作</th>
-                            </tr>
-
-                         {% for x in projects%}
-                            <tr>
-                                <td>{{x.id}}</td>
-                                <td>{{x.name}}</td>
-                                <td>{{x.describe}}</td>
-                                <td><a href="{{ url_for('data_import.form',pid=x.id) }}">上传</a></td>
-                            </tr>
-                            {% endfor%}
-                            <tr>
-                                <td><a href="{{ url_for('project.create') }}">创建项目</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="page-header d-md-flex justify-content-between align-items-center">
+    <h4>原始数据导入</h4>
+</div>
+<div class="card">
+    <div class="card-body">
+        <h5>请选择为哪个项目上传数据</h5>
+        <table class="table table-bordered">
+            <tr>
+                <th>项目id</th>
+                <th>项目名</th>
+                <th>描述</th>
+                <th>操作</th>
+            </tr>
+         {% for x in projects%}
+            <tr>
+                <td>{{x.id}}</td>
+                <td>{{x.name}}</td>
+                <td>{{x.describe}}</td>
+                <td><a href="{{ url_for('data_import.form',pid=x.id) }}">上传</a></td>
+            </tr>
+         {% endfor%}
+            <tr>
+                <td><a href="{{ url_for('project.create') }}">创建项目</a></td>
+            </tr>
+        </table>
     </div>
 </div>
 {% endblock %}

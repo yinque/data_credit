@@ -2,72 +2,58 @@
 {% block navigate_manual_check %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">数据修改</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <div class="return_pre">
-                                {#                                <a href="{{ url_for('main.manual_check',page=page) }}" class="">#}
-                                <a href="{{ url_for('main.manual_check',page=1) }}" class="">
-                                    <
-                                    <返回上一级
-                                </a>
-                            </div>
-                            {#                            <span>点位代码:1300000000511,数据采集时间:2021-05-15</span>#}
-                            <table width="100%"
-                                   class="am-table am-table-compact  tpl-table-black"
-                                   id="example-r">
-                                <tbody>
-                                <tr>
-                                    <td><input type="radio" name="system_or_customize" value="{{ today_max }}" checked>系统值
-                                    </td>
-                                    <td><select id="system">
-                                        <option selected value="{{ today_max }}">当天最大值</option>
-                                    </select>
-                                        <input type="text" id="today_max" name="auto_checked" value="{{ today_max }}">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="radio" name="system_or_customize" value="2">自定义</td>
-                                    <td><input type="text" id="customize" name="customize" value=""></td>
-                                </tr>
-                                <tr>
-                                    <td>修改原因:<textarea rows="6" cols="30">不变异常,按当天最大值修改！</textarea></td>
-                                    <td>
-                                        <table>
-                                            <tr>
-                                                <td>参数名称</td>
-                                                <td>{{ para.parameter_type.name }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>原始值</td>
-                                                <td id="default">{{ para.value }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>异常类型</td>
-                                                <td>{{ para.abnormals[0].abnormal_type.name }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>操作人</td>
-                                                <td>admin</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="#">
-                                        <a class="screen-btn" id="alert" href="javascript:;">修改</a> </a></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>数据人工审核</h4>
+    </div>
+    <div class="card">
+        <div class="card-header">数据修改</div>
+        <div class="card-body">
+            <a href="{{ url_for('main.manual_check',page=page) }}">
+                <i class="fa fa-backward"></i>
+                <span>返回上一级</span>
+            </a>
+            <table class="table table-bordered" id="example-r">
+                <tbody>
+                <tr>
+                    <td><input type="radio" name="system_or_customize" value="{{ today_max }}" checked>系统值
+                    </td>
+                    <td><select id="system">
+                        <option selected value="{{ today_max }}">当天最大值</option>
+                    </select>
+                        <input type="text" id="today_max" name="auto_checked" value="{{ today_max }}">
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="system_or_customize" value="2">自定义</td>
+                    <td><input type="text" id="customize" name="customize" value=""></td>
+                </tr>
+                <tr>
+                    <td>修改原因:<textarea rows="6" cols="30">不变异常,按当天最大值修改！</textarea></td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>参数名称</td>
+                                <td>{{ para.parameter_type.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>原始值</td>
+                                <td id="default">{{ para.value }}</td>
+                            </tr>
+                            <tr>
+                                <td>异常类型</td>
+                                <td>{{ para.abnormals[0].abnormal_type.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>操作人</td>
+                                <td>admin</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="btn btn-primary">
+                <div class="screen-btn" id="alert" onclick="javascript:;">修改</div>
             </div>
         </div>
     </div>

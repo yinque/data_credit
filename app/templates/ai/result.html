@@ -1,8 +1,4 @@
 {% extends "base.html" %}
-    {% block head %}
- {{ super() }}
-        <script src="{{ url_for("static",filename="assets/js/echarts.js") }}"></script>
-    {% endblock %}
 {% block navigate_intelligent_check %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
@@ -29,29 +25,39 @@
                                     <td>检测的属性</td>
                                     <td>{%for x in data['parameter_types']%}"{{x}},"{% endfor %}</td>
                                 </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% for x in data['parameter_types'] %}
+                     <div class="widget am-cf">
+                        <div class="widget-body am-fr">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>属性名</td>
+                                    <td>{{x}}</td>
+                                </tr>
                                 <tr>
                                     <td>检测数据量</td>
-                                    <td>{{data['num']}}</td>
+                                    <td>{{data[x]['num']}}</td>
                                 </tr>
                                 <tr>
                                     <td>异常数据量</td>
-                                    <td>{{data['abnormal_num']}}</td>
+                                    <td>{{data[x]['abnormal_num']}}</td>
                                 </tr>
                                 <tr>
                                     <td>异常比例</td>
-                                    <td>{{data['proportion']}}</td>
-                                </tr>
-                                <tr>
-                                    <td>具体结果</td>
-                                    <td><body>
-  <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
-  <div id="main" style="width: 600px;height:400px;"></div>
-</body></td>
+                                    <td>{{data[x]['proportion']}}</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    {% endfor %}
+
+
                 </div>
             </div>
         </div>
@@ -60,7 +66,6 @@
 
 {% block script %}
     {{ super() }}
-<!--TODO 换成饼图-->
     <script type="text/javascript">
       // 基于准备好的dom，初始化echarts实例
       var myChart = echarts.init(document.getElementById('main'));

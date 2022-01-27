@@ -1,0 +1,18 @@
+label ,span{
+  white-space: nowrap;
+}
+label{
+  margin:auto;
+}
+
+.form-group{
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+td.abnormal{
+  background-color: rgba(255,0,0,0.3);
+}
+li.page-item{
+  cursor: pointer;
+}

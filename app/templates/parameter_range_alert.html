@@ -2,44 +2,33 @@
 {% block navigate_expert_rule_setup %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div style="text-align:center" class="widget-title am-fl">参数范围修改</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <table width="100%"
-                                   class="am-table am-table-compact am-table-striped tpl-table-black"
-                                   id="example-r">
-                                <thead class="t-thead">
-                                <tr>
-                                    <td>参数</td>
-                                    <td>最大值</td>
-                                    <td>最小值</td>
-                                    <td>修改</td>
-                                </tr>
-                                </thead>
-                                <tbody class="table-content">
-                                {% for x in paras %}
-                                    <tr class="gradeX">
-                                        <td>{{ x.name }}</td>
-                                        <td><input id="max_{{ x.id }}" type="text" value="{{ x.max }}"></td>
-                                        <td><input id="min_{{ x.id }}" type="text" value="{{ x.min }}"></td>
-                                        <td><a class="screen-btn" id="alert_{{ x.id }}_btn" href="javascript:">修改</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>专家规则设置</h4>
+    </div>
+    <div class="card">
+        <div class="card-header">参数范围设置</div>
+        <div class="card-body">
+            <table class="table table-bordered" id="example-r">
+                <thead class="thead-light">
+                <tr>
+                    <th>参数</th>
+                    <th>最大值</th>
+                    <th>最小值</th>
+                    <th>修改</th>
+                </tr>
+                </thead>
+                <tbody class="table-content">
+                {% for x in paras %}
+                    <tr class="gradeX">
+                        <td>{{ x.name }}</td>
+                        <td><input id="max_{{ x.id }}" type="text" value="{{ x.max }}"></td>
+                        <td><input id="min_{{ x.id }}" type="text" value="{{ x.min }}"></td>
+                        <td><a class="screen-btn" id="alert_{{ x.id }}_btn" href="javascript:">修改</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

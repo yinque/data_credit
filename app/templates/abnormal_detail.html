@@ -2,50 +2,36 @@
 {% block navigate_auto_check %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">异常详情</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <div class="return_pre">
-                                <a href="{{ url_for('main.auto_check',page=page) }}" class="">
-                                    <
-                                    <返回上一级
-                                </a>
-                            </div>
-{#                            <span>点位代码:1300000000511,数据采集时间:2021-05-15</span>#}
-                            <table width="100%"
-                                   class="am-table am-table-compact  tpl-table-black"
-                                   id="example-r">
-                                <thead class="t-thead">
-                                <tr>
-                                    <th>异常ID</th>
-                                    <th>参数名</th>
-                                    <th>参数值</th>
-                                    <th>异常类型</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for a in data.abnormals %}
-                                    <tr>
-                                        <td>{{ a.id }}</td>
-                                        <td>{{ a.parameter_type.name }}</td>
-                                        <td>{{ a.parameter.value }}</td>
-                                        <td>{{ a.abnormal_type.name }}</td>
-                                    </tr>
-                                {% endfor %}
-
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>数据自动审核</h4>
+    </div>
+    <div class="card">
+        <div class="card-header">异常详情</div>
+        <div class="card-body">
+            <a href="{{ url_for('main.auto_check',page=page) }}">
+                <i class="fa fa-backward"></i>
+                <span>返回上一级</span>
+            </a>
+            <table class="table table-bordered" id="example-r">
+                <thead class="thead-light">
+                <tr>
+                    <th>异常ID</th>
+                    <th>参数名</th>
+                    <th>参数值</th>
+                    <th>异常类型</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for a in data.abnormals %}
+                    <tr>
+                        <td>{{ a.id }}</td>
+                        <td>{{ a.parameter_type.name }}</td>
+                        <td>{{ a.parameter.value }}</td>
+                        <td>{{ a.abnormal_type.name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

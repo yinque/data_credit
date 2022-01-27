@@ -2,35 +2,25 @@
 {% block navigate_upload %}class="active"{% endblock %}
 {% block context %}
 <!-- 内容区域 -->
-<div class="tpl-content-wrapper">
-    <div class="row-content am-cf">
-        <div class="row">
-            <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                <div class="widget am-cf">
-                    <div class="widget-head am-cf">
-                        <div class="widget-title am-fl">原始数据导入</div>
-                    </div>
-                    <div class="widget-body am-fr">
-                        <span>请选择数据载体</span>
-                        <table>
-                            <tr>
-                                <th>文件类型</th>
-                                <th>操作</th>
-                            </tr>
-                            <tr>
-                                <td>excel</td>
-                                <td><a href="{{ url_for('data_import.excel',pid=pid) }}">上传</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="page-header d-md-flex justify-content-between align-items-center">
+    <h4>原始数据导入</h4>
+</div>
+<div class="card">
+    <div class="card-header">请选择数据载体</div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <tr>
+                <th>文件类型</th>
+                <th>操作</th>
+            </tr>
+            <tr>
+                <td>excel</td>
+                <td><a href="{{ url_for('data_import.excel',pid=pid) }}">上传</a></td>
+            </tr>
+        </table>
     </div>
 </div>
 {% endblock %}
-
 {% block script %}
 {{ super() }}
 {% endblock %}

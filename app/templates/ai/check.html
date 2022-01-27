@@ -2,81 +2,101 @@
 {% block navigate_intelligent_check %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">智能审核</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <table>
-                                <tbody>
-                                <tr>
-                                    <td>选择算法</td>
-                                    <td>
-                                        <select id="algorithm">
-                                            {% for x in algorithms%}
-                                            <option value="{{x.id}}">{{x['name']}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                                <tbody id="algorithms_desc">
-                                {% for x in algorithms %}
-                                <tr id="algorithms_description_{{x['id']}}">
-                                    <td>描述</td>
-                                    <td>{{x['description']}}</td>
-                                </tr>
-                                {% endfor %}
-                                 </tbody>
-
-                                <tbody id="algorithms_paras">
-                                {% for x in algorithms %}
-                                <tr id="algorithms_paras_{{x['id']}}">
-                                    <td>算法参数</td>
-                                    <td>{{x['parameter']}}</td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                                <tbody>
-                                <tr>
-                                    <td>要检测的项目</td>
-                                    <td>
-                                        <select id="project">
-                                            {% for x in projects%}
-                                            <option value="{{x.id}}">{{x['name']}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                                <tbody id="project_paras">
-                                {% for x in projects%}
-                                <tr id="projects_paras_{{x['id']}}">
-                                    <td>选择要检测的数据元素</td>
-                                    <td>
-                                    {% for y in x.parameter_types %}
-                                    <input type="checkbox" name="parameters_{{x['id']}}" value="{{y.id}}" checked>{{y.name}}
-                                    {% endfor %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                                <tbody>
-                                <tr>
-                                    <td><a href="#">
-                                        <a class="screen-btn" id="start" href="javascript:;">开始</a> </a></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>智能审核</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>选择算法</td>
+                    <td>
+                        <select id="algorithm">
+                            {% for x in algorithms%}
+                            <option value="{{x.id}}">{{x['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>参数1</td>
+                    <td>123</td>
+                </tr>
+                <tr>
+                    <td>参数2</td>
+                    <td>5563</td>
+                </tr>
+                <tr>
+                    <td>参数3</td>
+                    <td>56643</td>
+                </tr>
+                <tr>
+                    <td>数据起止ID(最大11456: 最小:1)</td>
+                    <td>起始ID:<input type="text" id="id_start" value="1" name="auto_checked">
+                        终止ID:<input type="text" id="id_end" value="11456" name="auto_checked">
+                    </td>
+                </tr>
+                <tr>
+                    <td>选择要检测的数据元素</td>
+                    <td><input type="checkbox" name="parameters" value="1" checked="">水温
+                        <input type="checkbox" name="parameters" value="2" checked="">pH
+                        <input type="checkbox" name="parameters" value="3" checked="">溶解氧
+                        <input type="checkbox" name="parameters" value="4" checked="">电导率
+                        <input type="checkbox" name="parameters" value="5" checked="">浊度
+                        <input type="checkbox" name="parameters" value="6" checked="">高锰酸盐指数
+                        <input type="checkbox" name="parameters" value="7" checked="">氨氮
+                        <input type="checkbox" name="parameters" value="8" checked="">总磷
+                        <input type="checkbox" name="parameters" value="9" checked="">总氮
+                        <input type="checkbox" name="parameters" value="10" checked="">叶绿素α
+                        <input type="checkbox" name="parameters" value="11" checked="">藻密度
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="btn btn-primary">
+                <div class="screen-btn" id="start" onclick="javascript:;">开始</div>
             </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">审核结果</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td>检测的数据总数</td>
+                        <td>11456
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>异常数量</td>
+                        <td>345</td>
+                    </tr>
+                    <tr>
+                        <td>异常比例</td>
+                        <td>0.03%</td>
+                    </tr>
+                    <tr>
+                        <td>检测的数据元素</td>
+                        <td>
+                            高锰酸盐指数;氨氮;总磷
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>检测结果</td>
+                        <td>[ 1., 1., 1., 1., 1., 1., 1., 1., 1., -1., -1., 1., 1.,<br>
+                            1., 1., 1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1.,<br>
+                            1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
+                            1., 1., 1., 1., -1., 1., -1., -1., 1., 1., 1., 1., 1.,<br>
+                            1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1., -1., 1.,<br>
+                            1., 1., 1., 1., 1., 1., -1., 1., 1., 1., 1., 1., 1.,<br>
+                            1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,<br>
+                            1., 1., 1., 1., 1.]<br>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}
