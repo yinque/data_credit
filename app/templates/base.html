@@ -1,146 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    {% block head %}
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>通用数据可信识别系统</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="renderer" content="webkit">
-        <meta http-equiv="Cache-Control" content="no-siteapp"/>
-        <script src="http://cdn.bootcss.com/echarts/3.3.2/echarts.min.js"></script>
-        <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/amazeui.min.css") }}"/>
-        <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/amazeui.datatables.min.css") }}"/>
-        <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/app.css") }}">
-        <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/main.css") }}">
-        <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/version.css") }}">
-        <script src="{{ url_for("static",filename="assets/js/jquery-1.10.2.min.js") }}"></script>
-        <script src="{{ url_for("static",filename="assets/js/public.js") }}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-        <script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    {% endblock %}
+{% block head %}
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>通用数据可信识别系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+
+    <!-- begin::global styles -->
+    <link rel="stylesheet" href="{{ url_for("static",filename="assets/vendors/bundle.css") }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/app.css") }}" type="text/css">
+    <!-- end::global styles -->
+
+    <!-- begin::datepicker -->
+    <link rel="stylesheet" href="{{url_for("static", filename="assets/vendors/datepicker/daterangepicker.css")}}">
+    <!-- begin::datepicker -->
+
+    <!-- begin::vmap -->
+    <link rel="stylesheet" href="{{url_for("static", filename="assets/vendors/vmap/jqvmap.min.css")}}">
+    <!-- begin::vmap -->
+
+    <!-- begin::custom styles -->
+    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/app.css")}}" type="text/css">
+    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/custom.css")}}" type="text/css">
+    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/fix.css")}}" type="text/css">
+    <!-- end::custom styles -->
+
+    <!-- begin::jquery -->
+    <script src="{{url_for("static", filename="assets/vendors/jquery/jquery-3.6.0.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/vendors/jquery/jquery.cookie.js")}}"></script>
+    <script src="{{url_for("static",filename="assets/vendors/jquery/jquery-ui.js") }}"></script>
+    <!-- end::jquery -->
+
+    <!-- begin::global scripts -->
+    <script src="{{url_for("static", filename="assets/vendors/bundle.js")}}"></script>
+    <!-- end::global scripts -->
+
+    <!-- begin::charts -->
+    <script src="{{url_for("static", filename="assets/vendors/charts/chartjs/chart.min.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/vendors/charts/peity/jquery.peity.min.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/js/examples/charts/chartjs.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/js/examples/charts/peity.js")}}"></script>
+    <!-- end::charts -->
+
+    <!-- begin::daterangepicker -->
+    <script src="{{url_for("static", filename="assets/vendors/datepicker/daterangepicker.js")}}"></script>
+    <!-- end::daterangepicker -->
+
+    <!-- begin::dashboard -->
+    <script src="{{url_for("static", filename="assets/js/examples/dashboard.js")}}"></script>
+    <!-- end::dashboard -->
+
+    <!-- begin::vamp -->
+    <script src="{{url_for("static", filename="assets/vendors/vmap/jquery.vmap.min.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/vendors/vmap/maps/jquery.vmap.usa.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/js/examples/vmap.js")}}"></script>
+    <!-- end::vamp -->
+
+{% endblock %}
 </head>
-<body data-type="chart">
-<script src="{{ url_for("static",filename="assets/js/theme.js") }}"></script>
+<body>
+<!-- begin::page loader-->
+<div class="page-loader">
+    <div class="spinner-border"></div>
+    <span>载入中 ...</span>
+</div>
+<!-- end::page loader -->
 
-<div class="am-g tpl-g">
-    <!-- 头部 -->
-    <header>
-        <!-- logo -->
-        <div class="am-fl tpl-header-logo">
-            <span class="big-title">通用数据可信识别系统</span>
-            {#            <span class="small-title">生态数据智能分析系统</span>#}
-        </div>
-        <!-- 右侧内容 -->
-        <div class="tpl-header-fluid">
-            <!-- 其它功能-->
-            <div class="am-fr">
-
-                    <!-- 欢迎语 -->
-                    <li>
-                        <div><span style="color:#FFFFFF">当前查看的项目:</span></div>
-                    </li>
-                    <li>
-                        <select id="projects">
-                            <option selected value="0">未设置</option>
-                        </select>
-                    </li>
-
-            </div>
-        </div>
-
-    </header>
-    <!-- 侧边导航栏 -->
-    <div class="left-sidebar">
-        <ul class="sidebar-nav">
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.index") }}" {% block navigate_index %}{% endblock %}>
-                    <i class="am-icon-home sidebar-nav-link-logo"></i> 主页
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("data_import.index") }}" {% block navigate_upload %}{% endblock %}>
-                    <i class="am-icon-home sidebar-nav-link-logo"></i> 原始数据导入
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.data_table") }}" {% block navigate_datas %}{% endblock %}>
-                    <i class="am-icon-table sidebar-nav-link-logo"></i> 原始数据查看
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.auto_check") }}" {% block navigate_auto_check %}{% endblock %}>
-                    <i class="am-icon-table sidebar-nav-link-logo"></i> 数据自动审核
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("main.manual_check") }}" {% block navigate_manual_check %}{% endblock %}>
-                    <i class="am-icon-table sidebar-nav-link-logo"></i> 数据人工审核
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="{{ url_for("ai.check") }}" {% block navigate_intelligent_check %}{% endblock %}>
-                    <i class="am-icon-table sidebar-nav-link-logo"></i> 数据智能审核
-                </a>
-            </li>
-            <li class="sidebar-nav-link">
-                <a href="javascript:;" class="sidebar-nav-sub-title">
-                    <i class="am-icon-table sidebar-nav-link-logo"></i>审核规则设置
-                    <span class="am-icon-chevron-down am-fr am-margin-right-sm sidebar-nav-sub-ico"></span>
-                </a>
-                <ul class="sidebar-nav sidebar-nav-sub">
-                    <li class="sidebar-nav-link">
-                        <a href="{{ url_for("main.expert_rule_setup") }}"
-                                {% block navigate_expert_rule_setup %}{% endblock %}>
-                            <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 专家审核规则设置
-                        </a>
-                    </li>
-
-                    <li class="sidebar-nav-link">
-                        <a href="{{ url_for("ai.set_algorithm") }}"
-                                {% block navigate_intelligent_rule_setup %}{% endblock %}>
-                            <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 智能审核规则设置
-                        </a>
-                    </li>
-                </ul>
-            </li>
+<!-- 侧边菜单-->
+<div class="side-menu">
+    <div class="side-menu-body">
+        <ul>
+        <li class="side-menu-divider">Navigation</li>
+        <li>
+            <a href="{{ url_for("main.index") }}" {% block navigate_index %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for("data_import.index") }}" {% block navigate_upload %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>原始数据导入</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for("main.data_table") }}" {% block navigate_datas %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>原始数据查看</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for("main.auto_check") }}" {% block navigate_auto_check %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>数据自动审核</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for("main.manual_check") }}" {% block navigate_manual_check %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>数据人工审核</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for("ai.check") }}" {% block navigate_intelligent_check %}{% endblock %}>
+                <i class="icon ti-home"></i>
+                <span>数据智能审核</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="icon ti-home"></i>
+                <span>审核规则设置</span>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ url_for("main.expert_rule_setup") }}"
+                            {% block navigate_expert_rule_setup %}{% endblock %}>
+                        专家审核规则设置
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for("ai.set_algorithm") }}"
+                            {% block navigate_intelligent_rule_setup %}{% endblock %}>
+                        智能审核规则设置
+                    </a>
+                </li>
+            </ul>
+        </li>
         </ul>
     </div>
-    <!-- 内容区域 -->
-    {% block context %}
-    {% endblock %}
-    <p class="bottom-bar">通用数据可信识别系统</p>
 </div>
+<!-- 标题栏-->
+<nav class="navbar">
+    <div class="container-fluid">
+        <!--            logo area-->
+        <div class="header-logo">
+            <a href="#">
+                <img src="{{ url_for("static",filename="assets/media/image/light-logo.png") }}" alt="...">
+                <span class="logo-text text-nowrap">通用数据可信识别系统</span>
+            </a>
+        </div>
+        <!--            greet text-->
+        <div class="header-body">
+            <div class="navbar-nav"></div>
+            <div class="navbar-nav">
+                <span class="text-white">当前查看的项目为：{{ project_name if project_name }}</span>
+                <select id="projects">
+                    <option selected value="0">未设置</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 内容区域 -->
+<main class="main-content">
+    <div class="container-fluid">
+        {% block context %}
+        {% endblock %}
+    </div>
+</main>
+
+<!-- 页脚 -->
+{#<p class="bottom-bar">通用数据可信识别系统</p>#}
 {% block script %}
-    <script src="http://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
-    <script src="{{ url_for("static",filename="assets/js/amazeui.datatables.min.js") }}"></script>
-    <script src="{{ url_for("static",filename="assets/js/dataTables.responsive.min.js") }}"></script>
+    <!-- begin::custom scripts -->
+    <script src="{{url_for("static", filename="assets/js/custom.js")}}"></script>
+    <script src="{{url_for("static", filename="assets/js/app.js")}}"></script>
+    <!-- end::custom scripts -->
     <script type="text/javascript">
-            $.ajax({
-                url: '{{ url_for('project.get') }}',
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (data) {
-                    p=document.getElementById("projects")
-                    for(var i=0;i<data.length;i++){
-                        var _op = document.createElement('option');
-                        _op.value = data[i]['id']
-                        _op.innerText = data[i]['name']
-                        if(data[i]['selected']){
-                            _op.selected=true
-                        }
-                        p.appendChild(_op)
+        $.ajax({
+            url: '{{ url_for('project.get') }}',
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                let p=document.getElementById("projects")
+                for(var i=0;i<data.length;i++){
+                    var _op = document.createElement('option');
+                    _op.value = data[i]['id']
+                    _op.innerText = data[i]['name']
+                    if(data[i]['selected']){
+                        _op.selected=true
                     }
-                },
-                error: function (xhr) {
-                    console.error('error');
+                    p.appendChild(_op)
                 }
-            });
-    </script>
-<script type="text/javascript">
-$("#projects").change(function(){
-p=document.getElementById("projects")
-$.ajax({
+            },
+            error: function (xhr) {
+                console.error('error');
+            }
+        })
+        $("#projects").change(function(){
+            let p = document.getElementById("projects")
+            $.ajax({
                 url: '/set_project'+'/'+p.value,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
@@ -151,8 +206,8 @@ $.ajax({
                     console.error('error');
                 }
             });
-});
-</script>
+        });
+    </script>
 {% endblock %}
 </body>
 </html>

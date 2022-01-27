@@ -2,52 +2,53 @@
 {% import "_macros.html" as macros %}
 {% block head %}
     {{ super() }}
-    <script src="{{ url_for("static",filename="assets/js/manage.js") }}"></script>
-    <script src="{{ url_for("static",filename="assets/js/pagination.js") }}"></script>
+    <script src="{{ url_for("static",filename="assets/js/function/manage.js") }}"></script>
+    <script src="{{ url_for("static",filename="assets/js/function/pagination.js") }}"></script>
 {% endblock %}
 {% block navigate_datas %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">原始数据查看</div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>原始数据查看</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <!--日期选择-->
+            <form>
+                <div class="form-row">
+                    <div class="form-group col d-flex flex-row">
+                        <label for="start_time" class="text-nowrap m-auto">起始时间</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="start_time" placeholder="Email">
                         </div>
-                        <div class="widget-body  widget-body-lg am-fr">
-                            <div class="screen-div">
-                                <span>起始时间：</span>
-                                <input type="text" placeholder="--请输入--" id="trains_start">
-                                <span>终止时间：</span>
-                                <input type="text" placeholder="--请输入--" id="trains_end">
-                                <a class="screen-btn" id="data_btn" href="javascript:;">搜索</a>
-                            </div>
-                            <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black "
-                                   id="example_r">
-                                <thead class="t-thead">
-                                <tr>
-                                    <th>时间</th>
-                                    {% for x in p_types %}
-                                        <th>{{ x.name }}({{ x.unit }})</th>
-                                    {% endfor %}
-                                </tr>
-                                </thead>
-                                <tbody class="table-content">
-                                {#                                <div id="trains_iterms"></div>#}
-                                </tbody>
-                            </table>
-
-                            <div class="am-fr">
-                                <div class="am-pagination tpl-pagination">
-                                    <div id="data_widget"></div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="form-group col d-flex flex-row">
+                        <label for="end_time" class="text-nowrap m-auto">终止时间</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="end_time" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="btn btn-primary">
+                            <div class="screen-btn" id="data_btn" onclick="javascript:;">搜索</div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
+            <!--表格-->
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        {% for x in p_types %}
+                            <th>{{ x.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="table-content">
+                </tbody>
+            </table>
+            <div id="data_widget"></div>
         </div>
     </div>
 {% endblock %}

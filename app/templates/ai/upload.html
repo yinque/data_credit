@@ -2,6 +2,18 @@
 {% block navigate_upload %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>...</h4>
+    </div>
+    <div class="card">
+    <div class="card-header">算法文件上传</div>
+    <div class="card-body">
+        <form action="" enctype='multipart/form-data' method='POST'>
+            <input type="file" name="file">
+            <input type="submit" value="上传">
+        </form>
+    </div>
+</div>
     <div class="tpl-content-wrapper">
         <div class="row-content am-cf">
             <div class="row">

@@ -2,72 +2,96 @@
 {% import "_macros.html" as macros %}
 {% block head %}
     {{ super() }}
-    <script src="{{ url_for("static",filename="assets/js/manage.js") }}"></script>
-    <script src="{{ url_for("static",filename="assets/js/pagination.js") }}"></script>
+{#    <script src="{{ url_for("static",filename="assets/js/function/manage.js") }}"></script>#}
+    <script src="{{ url_for("static",filename="assets/js/function/pagination.js") }}"></script>
 
 {% endblock %}
 {% block navigate_manual_check %}class="active"{% endblock %}
 {% block context %}
-    <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">数据人工审核</div>
+   <!-- 内容区域 -->
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>数据人工审核</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form>
+                <div class="form-row col-md-9">
+                    <div class="form-group col">
+                        <label for="time_from">起始时间</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="time_from" placeholder="Email">
                         </div>
-                        <div class="widget-body am-fr">
-                            <div class="screen-div">
-                                <span>起始时间：</span>
-                                <input type="text" placeholder="--请输入--" id="trains_start">
-                                <span>终止时间：</span>
-                                <input type="text" placeholder="--请输入--" id="trains_end">
-                                <span>异常类别：</span>
-                                <select id="abnormal_type">
-                                    <option selected value="all">所有异常</option>
+                    </div>
+                    <div class="form-group col">
+                        <label for="time_to">终止时间</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="time_to" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="form-group col">
+                        <label for="abnormal_type">异常类别</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="abnormal_type">
+                                    <option selected="" value="all">所有异常</option>
                                     {% for type in abnormal_types %}
                                         <option value="{{ type.name }}">{{ type.name }}</option>
                                     {% endfor %}
                                 </select>
-                                </br>
-                                <span>选择审核参数：</span>
-                                {% for x in p_types %}
-                                    <input type="checkbox" name="parameters" value="{{ x.id }}" checked>{{ x.name }}
-                                {% endfor %}
-                                </br>
-                                <span>选择审核类型：</span>
-                                <input type="radio" name="check_type" value="all" checked>全部数据
-                                <input type="radio" name="check_type" value="true">自动审核有异常数据
-                                <input type="radio" name="check_type" value="false">自动审核无异常数据
+                        </div>
+                    </div>
 
-                                <a class="screen-btn" id="data_btn" href="javascript:">查询</a>
+                </div>
+                <div class="form-row col-md-9">
+                    <div class="form-group col ">
+                        <span>选择审核参数：</span>
+                        {% for x in p_types %}
+                            <div class="form-check form-check-inline m-r-5">
+                                <input class="form-check-input" type="checkbox" name="parameters" id="p{{ x.id }}" value="{{ x.id }}" checked>
+                                <label class="form-check-label" for="p{{ x.id }}">{{ x.name }}</label>
                             </div>
-                            <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black "
-                                   id="example_r">
-                                <thead class="t-thead">
-                                <tr>
-                                    <th>时间</th>
-                                    {% for x in p_types %}
-                                        <th>{{ x.name }}({{ x.unit }})</th>
-                                    {% endfor %}
-                                    <th>修改</th>
-                                </tr>
-                                </thead>
-                                <tbody class="table-content">
-                                {#                                <div id="trains_iterms"></div>#}
-                                </tbody>
-                            </table>
-
-                            <div class="am-fr">
-                                <div class="am-pagination tpl-pagination">
-                                    <div id="data_widget"></div>
-                                </div>
-                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row col-md-9">
+                    <div class="form-group col">
+                        <span>选择审核类型：</span>
+                        <div class="form-check form-check-inline m-r-5">
+                            <input type="radio" class="form-check-input" name="check_type" id="all" value="all" checked="checked">
+                            <label class="form-check-label" for="all">全部数据</label>
+                        </div>
+                        <div class="form-check form-check-inline m-r-5">
+                            <input type="radio" class="form-check-input" name="check_type" id="true" value="true">
+                            <label class="form-check-label" for="true">自动审核有异常数据</label>
+                        </div>
+                        <div class="form-check form-check-inline m-r-5">
+                            <input type="radio" class="form-check-input" name="check_type" id="false" value="false">
+                            <label class="form-check-label" for="false">自动审核无异常数据</label>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="form-row col-md-9">
+                    <div class="form-group col">
+                        <button type="button" class="btn btn-primary">搜索</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table table-striped table-bordered">
+                <thead class="t-thead">
+                    <tr>
+                        <th>时间</th>
+                        {% for x in p_types %}
+                            <th>{{ x.name }}</th>
+                        {% endfor %}
+                        <th>异常详情</th>
+                    </tr>
+                </thead>
+                <tbody class="table-content">
+                    <!--测试数据-->
+                    <tr class="gradeX"><td>2019-04-01 01:00:00</td><td class="abnormal">13.7</td><td>8.27</td><td>12.14</td><td>855.2</td><td>4.1</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>5.57</td><td>4601</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 02:00:00</td><td class="abnormal">13.6</td><td>8.26</td><td>12.07</td><td>855.7</td><td>4.2</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>5.62</td><td>4689</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 03:00:00</td><td class="abnormal">13.4</td><td>8.25</td><td>11.99</td><td>854.6</td><td>4</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>6.11</td><td>4813</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 04:00:00</td><td class="abnormal">13.3</td><td>8.24</td><td>11.75</td><td>854.1</td><td>4.2</td><td>8.82</td><td>-0.03</td><td>0.063</td><td>1.34</td><td>6.91</td><td>5645</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 05:00:00</td><td class="abnormal">13</td><td>8.22</td><td>11.63</td><td>854.3</td><td>4.2</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>6.24</td><td>5439</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 06:00:00</td><td class="abnormal">13.1</td><td>8.2</td><td>11.38</td><td>854.7</td><td>4.5</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>7.21</td><td>6173</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 07:00:00</td><td class="abnormal">13</td><td>8.19</td><td>11.19</td><td>854</td><td>4.4</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>6.96</td><td>6865</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 08:00:00</td><td class="abnormal">12.9</td><td>8.2</td><td>11.34</td><td>853.5</td><td>4.8</td><td>8.02</td><td>-0.026</td><td>0.069</td><td>1.47</td><td>5.77</td><td>6855</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 09:00:00</td><td class="abnormal">12.9</td><td>8.26</td><td>11.79</td><td>852.7</td><td>4.8</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>5.88</td><td>7149</td><td><a href="#">查看</a></td></tr><tr class="gradeX"><td>2019-04-01 10:00:00</td><td class="abnormal">13.3</td><td>8.3</td><td>12.12</td><td>852.7</td><td>4.4</td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td class="abnormal"></td><td>5.18</td><td>6675</td><td><a href="#">查看</a></td></tr>
+                    <!--结束测试数据-->
+                </tbody>
+            </table>
+            <div id="data_widget"></div>
         </div>
     </div>
 {% endblock %}

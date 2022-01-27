@@ -2,78 +2,69 @@
 {% block navigate_intelligent_rule_setup %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">算法上传</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <form action="" enctype='multipart/form-data' method='POST'>
-                                <table>
-                                    <tr>
-                                        <td>算法名</td>
-                                        <td><input type="text" id="name" value=""></td>
-                                    </tr>
-                                    <tr>
-                                        <td>算法描述</td>
-                                        <td><textarea id="desc" rows="6" cols="30">填写算法描述</textarea></td>
-                                    </tr>
-                                    <tr>
-                                        <td>先训练再识别还是直接识别</td>
-                                        <td><select id="train_first">
-                                        <option selected value="1">训练后再进行预测</option>
-                                        <option value="2">直接预测</option>
-                                        </select></td>
-                                    </tr>
-                                    <tr>
-                                        <td>参数名:<input id="para1_name" type="text" value=""></td>
-                                        <td>参数值:<input id="para1_value" type="text" value=""></td>
-                                    </tr>
-                                 <tr>
-                                        <td>参数名:<input id="para2_name" type="text" value=""></td>
-                                        <td>参数值:<input id="para2_value" type="text" value=""></td>
-                                    </tr>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>智能审核规则设置</h4>
+    </div>
+    <div class="card">
+        <div class="card-header">算法上传</div>
+        <div class="card-body">
+            <form action="" enctype='multipart/form-data' method='POST'>
+                <table class="table table-bordered">
+                    <tr>
+                        <td>算法名</td>
+                        <td><input type="text" id="name" value=""></td>
+                    </tr>
+                    <tr>
+                        <td>算法描述</td>
+                        <td><textarea id="desc" rows="6" cols="30">填写算法描述</textarea></td>
+                    </tr>
+                    <tr>
+                        <td>先训练再识别还是直接识别</td>
+                        <td><select id="train_first">
+                        <option selected value="1">训练后再进行预测</option>
+                        <option value="2">直接预测</option>
+                        </select></td>
+                    </tr>
+                    <tr>
+                        <td>参数名:<input id="para1_name" type="text" value=""></td>
+                        <td>参数值:<input id="para1_value" type="text" value=""></td>
+                    </tr>
+                 <tr>
+                        <td>参数名:<input id="para2_name" type="text" value=""></td>
+                        <td>参数值:<input id="para2_value" type="text" value=""></td>
+                    </tr>
 <!--                                    <tr>-->
 <!--                                        <td><input type="button" value="增加参数"></td>-->
 <!--                                    </tr>-->
-                                    <tr>
-                                        <td><a class="screen-btn" id="alert" href="javascript:;">确定</a></td>
-                                    </tr>
-                                </table>
-                            </form>
-
-                        </div>
-                    </div>
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">算法列表</div>
-                        </div>
-                        <div class="widget-body am-fr">
-                            <table>
-                                <tr>
-                                    <td>算法上传名称</td>
-                                    <td>算法参数</td>
-                                    <td>参数修改</td>
-                                </tr>
-                                {%for x in als %}
-                                <tr>
-                                    <td>{{x.name}}</td>
-                                    <td>{{x.parameter}}</td>
-                                    <td><a href="#">
-                                        <i class="am-icon-pencil"></i>修改
-                                    </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </div>
+                </table>
+                <div class="btn btn-primary">
+                    <div class="screen-btn" id="alert" onclick="javascript:;">确定</div>
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">算法列表</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <td>算法上传名称</td>
+                        <td>算法参数</td>
+                        <td>参数修改</td>
+                    </tr>
+                </thead>
+                {%for x in als %}
+                <tr>
+                    <td>{{x.name}}</td>
+                    <td>{{x.parameter}}</td>
+                    <td><a href="#">
+                        <i class="fa fa-pencil"></i>修改
+                    </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
 {% endblock %}
