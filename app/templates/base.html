@@ -11,53 +11,53 @@
     <meta name="renderer" content="webkit">
 
     <!-- begin::global styles -->
-    <link rel="stylesheet" href="{{ url_for("static",filename="assets/vendors/bundle.css") }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for("static",filename="assets/css/app.css") }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for("static",filename="vendors/bundle.css") }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for("static",filename="css/app.css") }}" type="text/css">
     <!-- end::global styles -->
 
     <!-- begin::datepicker -->
-    <link rel="stylesheet" href="{{url_for("static", filename="assets/vendors/datepicker/daterangepicker.css")}}">
+    <link rel="stylesheet" href="{{url_for("static", filename="vendors/datepicker/daterangepicker.css")}}">
     <!-- begin::datepicker -->
 
     <!-- begin::vmap -->
-    <link rel="stylesheet" href="{{url_for("static", filename="assets/vendors/vmap/jqvmap.min.css")}}">
+    <link rel="stylesheet" href="{{url_for("static", filename="vendors/vmap/jqvmap.min.css")}}">
     <!-- begin::vmap -->
 
     <!-- begin::custom styles -->
-    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/app.css")}}" type="text/css">
-    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/custom.css")}}" type="text/css">
-    <link rel="stylesheet" href="{{url_for("static", filename="assets/css/fix.css")}}" type="text/css">
+    <link rel="stylesheet" href="{{url_for("static", filename="css/app.css")}}" type="text/css">
+    <link rel="stylesheet" href="{{url_for("static", filename="css/custom.css")}}" type="text/css">
+    <link rel="stylesheet" href="{{url_for("static", filename="css/fix.css")}}" type="text/css">
     <!-- end::custom styles -->
 
     <!-- begin::jquery -->
-    <script src="{{url_for("static", filename="assets/vendors/jquery/jquery-3.6.0.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/vendors/jquery/jquery.cookie.js")}}"></script>
-    <script src="{{url_for("static",filename="assets/vendors/jquery/jquery-ui.js") }}"></script>
+    <script src="{{url_for("static", filename="vendors/jquery/jquery-3.6.0.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/jquery/jquery.cookie.js")}}"></script>
+    <script src="{{url_for("static",filename="vendors/jquery/jquery-ui.js") }}"></script>
     <!-- end::jquery -->
 
     <!-- begin::global scripts -->
-    <script src="{{url_for("static", filename="assets/vendors/bundle.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/bundle.js")}}"></script>
     <!-- end::global scripts -->
 
     <!-- begin::charts -->
-    <script src="{{url_for("static", filename="assets/vendors/charts/chartjs/chart.min.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/vendors/charts/peity/jquery.peity.min.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/js/examples/charts/chartjs.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/js/examples/charts/peity.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/charts/chartjs/chart.min.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/charts/peity/jquery.peity.min.js")}}"></script>
+    <script src="{{url_for("static", filename="js/examples/charts/chartjs.js")}}"></script>
+    <script src="{{url_for("static", filename="js/examples/charts/peity.js")}}"></script>
     <!-- end::charts -->
 
     <!-- begin::daterangepicker -->
-    <script src="{{url_for("static", filename="assets/vendors/datepicker/daterangepicker.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/datepicker/daterangepicker.js")}}"></script>
     <!-- end::daterangepicker -->
 
     <!-- begin::dashboard -->
-    <script src="{{url_for("static", filename="assets/js/examples/dashboard.js")}}"></script>
+    <script src="{{url_for("static", filename="js/examples/dashboard.js")}}"></script>
     <!-- end::dashboard -->
 
     <!-- begin::vamp -->
-    <script src="{{url_for("static", filename="assets/vendors/vmap/jquery.vmap.min.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/vendors/vmap/maps/jquery.vmap.usa.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/js/examples/vmap.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/vmap/jquery.vmap.min.js")}}"></script>
+    <script src="{{url_for("static", filename="vendors/vmap/maps/jquery.vmap.usa.js")}}"></script>
+    <script src="{{url_for("static", filename="js/examples/vmap.js")}}"></script>
     <!-- end::vamp -->
 
 {% endblock %}
@@ -140,7 +140,7 @@
         <!--            logo area-->
         <div class="header-logo">
             <a href="#">
-                <img src="{{ url_for("static",filename="assets/media/image/light-logo.png") }}" alt="...">
+                <img src="{{ url_for("static",filename="media/image/light-logo.png") }}" alt="...">
                 <span class="logo-text text-nowrap">通用数据可信识别系统</span>
             </a>
         </div>
@@ -169,8 +169,8 @@
 {#<p class="bottom-bar">通用数据可信识别系统</p>#}
 {% block script %}
     <!-- begin::custom scripts -->
-    <script src="{{url_for("static", filename="assets/js/custom.js")}}"></script>
-    <script src="{{url_for("static", filename="assets/js/app.js")}}"></script>
+    <script src="{{url_for("static", filename="js/custom.js")}}"></script>
+    <script src="{{url_for("static", filename="js/app.js")}}"></script>
     <!-- end::custom scripts -->
     <script type="text/javascript">
         $.ajax({

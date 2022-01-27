@@ -2,8 +2,8 @@
 {% import "_macros.html" as macros %}
 {% block head %}
     {{ super() }}
-    <script src="{{ url_for("static",filename="assets/js/function/manage.js") }}"></script>
-    <script src="{{ url_for("static",filename="assets/js/function/pagination.js") }}"></script>
+    <script src="{{ url_for("static",filename="js/function/manage.js") }}"></script>
+    <script src="{{ url_for("static",filename="js/function/pagination.js") }}"></script>
 {% endblock %}
 {% block navigate_datas %}class="active"{% endblock %}
 {% block context %}
