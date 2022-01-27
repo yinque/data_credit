@@ -8,45 +8,31 @@
 {% block navigate_datas %}class="active"{% endblock %}
 {% block context %}
     <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">选择要查看的项目</div>
-                        </div>
-                        <div class="widget-body  widget-body-lg am-fr">
-                            <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black "
-                                   id="example_r">
-                                <thead class="t-thead">
-                                <tr>
-                                    <th>项目名</th>
-                                    <th>项目描述</th>
-                                    <th>操作</th>
-                                </tr>
-
-                                </thead>
-                                <tbody class="table-content">
-                                {% for x in p %}
-                                <tr>
-                                    <td>{{x.name}}</td>
-                                    <td>{{x.describe}}</td>
-                                    <td><a class="screen-btn" id="data_btn" href="{{url_for("main.set_project",pid=x.id)}}">设置</a></td>
-                                </tr>
-                                {%endfor%}
-                                </tbody>
-                            </table>
-
-                            <div class="am-fr">
-                                <div class="am-pagination tpl-pagination">
-                                    <div id="data_widget"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="page-header d-md-flex justify-content-between align-items-center">
+        <h4>选择要查看的项目</h4>
+    </div>
+    <div class="card">
+        <div class="card-header">选择要查看的项目</div>
+        <div class="card-body">
+            <table class="table table-bordered" id="example_r">
+                <thead class="thead-light">
+                    <tr>
+                        <th>项目名</th>
+                        <th>项目描述</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="table-content">
+                    {% for x in p %}
+                    <tr>
+                        <td>{{x.name}}</td>
+                        <td>{{x.describe}}</td>
+                        <td><a class="screen-btn" id="data_btn" href="{{url_for("main.set_project",pid=x.id)}}">设置</a></td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+            <div id="data_widget"></div>
         </div>
     </div>
 {% endblock %}

@@ -9,32 +9,11 @@
     <div class="card-header">算法文件上传</div>
     <div class="card-body">
         <form action="" enctype='multipart/form-data' method='POST'>
-            <input type="file" name="file">
+            <input type="file" name="file" accept=".py" multiple="multiple">
             <input type="submit" value="上传">
         </form>
     </div>
 </div>
-    <div class="tpl-content-wrapper">
-        <div class="row-content am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-
-                    <div class="widget am-cf">
-                        <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">算法文件上传</div>
-                        </div>
-                        <div class="widget-body am-fr">
-
-                            <form action="" enctype='multipart/form-data' method='POST'>
-                                <input type="file" name="file">
-                                <input type="submit" value="上传">
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 {% block script %}
