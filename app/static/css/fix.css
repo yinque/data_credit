@@ -20,4 +20,9 @@ li.page-item {
   cursor: pointer;
 }
 
+i.icon {
+  width: 20px;
+  text-align: center;
+}
+
 /*# sourceMappingURL=fix.css.map */
