@@ -1,11 +1,16 @@
 {% extends "base.html" %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
 {% block navigate_intelligent_check %}class="active"{% endblock %}
 {% block context %}
-    <!-- 内容区域 -->
+
+      <!-- 内容区域 -->
     <div class="page-header d-md-flex justify-content-between align-items-center">
         <h4>智能审核</h4>
     </div>
-    <div class="card">
+        <div class="card">
         <div class="card-body">
             <table class="table table-bordered">
                 <tbody>
@@ -55,8 +60,10 @@
                     <td>选择要检测的数据元素</td>
                     <td>
                     {% for y in x.parameter_types %}
+<!--                    <input type="checkbox" name="parameters_{{x['id']}}" value="{{y.id}}" checked>{{y.name}}-->
                     <input type="checkbox" name="parameters_{{x['id']}}" value="{{y.id}}" checked>{{y.name}}
                     {% endfor %}
+                        <input type="checkbox" id="selectAll{{x['id']}}" name="selectAll">全选
                     </td>
                 </tr>
                 {% endfor %}
@@ -67,6 +74,7 @@
             </div>
         </div>
     </div>
+
 
 {% endblock %}
 
@@ -159,6 +167,9 @@
                 data: JSON.stringify(_data),
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
+                beforeSend: function () {
+                $("body").append('<div id="pload" style="position:fixed;top:30%;z-index:1200;background:url({{ url_for("static",filename="media/image/loading.jpeg") }}) top center no-repeat;width:100%;height:100%;margin:auto auto;"></div>');
+            },
                 success: function (data) {
                     window.location.href = data;
                 },
@@ -168,4 +179,19 @@
             });
         });
 </script>
+{% for x in projects%}
+<script type="text/javascript">
+$('input[id="selectAll{{x['id']}}"]').on("click",function(){
+        if($(this).is(':checked')){
+            $('input[name="parameters_{{x['id']}}"]').each(function(){
+                $(this).prop("checked",true);
+            });
+        }else{
+            $('input[name="parameters_{{x['id']}}"]').each(function(){
+                $(this).prop("checked",false);
+            });
+        }
+    });
+</script>
+{% endfor %}
 {% endblock %}
