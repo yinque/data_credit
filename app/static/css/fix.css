@@ -25,4 +25,15 @@ i.icon {
   text-align: center;
 }
 
+div.loading-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+}
+
 /*# sourceMappingURL=fix.css.map */
