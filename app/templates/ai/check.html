@@ -168,7 +168,7 @@
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 beforeSend: function () {
-                $("body").append('<div id="pload" style="position:fixed;top:30%;z-index:1200;background:url({{ url_for("static",filename="media/image/loading.jpeg") }}) top center no-repeat;width:100%;height:100%;margin:auto auto;"></div>');
+                $("#main_content").append('<div id="pload" style="position:fixed;top:30%;z-index:1200;background:url({{ url_for("static",filename="media/image/loading.jpeg") }}) top center no-repeat;width:100%;height:100%;margin:auto auto;"></div>');
             },
                 success: function (data) {
                     window.location.href = data;
